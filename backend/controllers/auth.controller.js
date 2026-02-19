@@ -11,7 +11,7 @@ const register = async (req, res) => {
     if (exists) return res.status(400).json({ error: "User already exists" });
 
     const hashPass = await bcrypt.hash(password, 10);
-    const newUser = User({
+    const newUser = new User({
       name,
       email,
       passwordHash: hashPass,
