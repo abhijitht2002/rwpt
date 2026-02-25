@@ -13,7 +13,7 @@ function Navbar() {
         {/* Right Actions */}
         <div className="flex items-center gap-6 text-sm">
           <Link
-            to="/login"
+            to="/account/login"
             className="text-gray-600 hover:text-black transition"
           >
             Login

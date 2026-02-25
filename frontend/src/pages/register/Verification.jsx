@@ -55,11 +55,11 @@ function Verification() {
         </p>
       </div>
 
-      {/* Google Login */}
+      {/* Google OAuth */}
       <div className="mt-6">
         <button
           type="button"
-          className="w-full flex items-center justify-center gap-3 border py-3 text-sm font-medium transition hover:bg-black hover:text-white"
+          className="w-full flex items-center justify-center gap-3 border py-3 text-sm font-medium transition hover:bg-black hover:text-white hover:cursor-pointer"
         >
           <img
             src="https://www.svgrepo.com/show/475656/google-color.svg"
@@ -103,7 +103,7 @@ function Verification() {
             ${
               isRunning
                 ? "text-gray-500 cursor-not-allowed"
-                : "border border-black text-black hover:bg-black hover:text-white"
+                : "border border-black text-black hover:bg-black hover:text-white hover:cursor-pointer"
             }`}
             >
               {isRunning ? formatTime(timeLeft) : "Send OTP"}
@@ -136,7 +136,7 @@ function Verification() {
             <button
               type="submit"
               onClick={handleVerify}
-              className="w-full mt-2 border border-black bg-black text-white py-3 transition hover:bg-white hover:text-black"
+              className="w-full mt-2 border border-black bg-black text-white py-3 transition hover:bg-white hover:text-black hover:cursor-pointer"
             >
               Verify →
             </button>
@@ -147,7 +147,7 @@ function Verification() {
       {/* Footer */}
       <p className="mt-6 text-sm text-gray-600 text-center">
         Already have an account?{" "}
-        <Link to="/login" className="relative font-medium text-black group">
+        <Link to="/account/login" className="relative font-medium text-black group">
           Login
           <span className="absolute left-0 -bottom-1 h-px w-0 bg-black transition-all duration-300 group-hover:w-full" />
         </Link>

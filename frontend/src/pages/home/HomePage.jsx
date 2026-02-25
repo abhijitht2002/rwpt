@@ -1,4 +1,5 @@
 import React from "react";
+import { Link } from "react-router-dom";
 
 function HomePage() {
   return (
@@ -135,9 +136,12 @@ function HomePage() {
         </h2>
 
         <div className="mt-10">
-          <button className="px-8 py-3 border border-black bg-black text-white hover:cursor-pointer hover:bg-white hover:text-black transition">
+          <Link
+            className="px-8 py-3 border border-black bg-black text-white hover:cursor-pointer hover:bg-white hover:text-black transition"
+            to="/account/verify"
+          >
             Create Account
-          </button>
+          </Link>
         </div>
       </section>
     </div>

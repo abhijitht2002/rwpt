@@ -12,18 +12,25 @@ const userSchema = mongoose.Schema(
       type: String,
       required: true,
       unique: true,
+      lowercase: true,
+      index: true,
     },
     passwordHash: {
       type: String,
-      required: true,
+      default: null,
     },
     role: {
       type: String,
       enum: ["ADMIN", "MANAGER", "EMPLOYEE"],
       default: "EMPLOYEE",
     },
+    status: {
+      type: String,
+      enum: ["INVITED", "ACTIVE", "BLOCKED"],
+      default: "INVITED"
+    }
   },
-  { timestamp: true },
+  { timestamps: true },
 );
 
 userSchema.plugin(paginate);

@@ -30,9 +30,10 @@ function CreateAccount() {
       //   const res = await register(formData);
       //   console.log(res);
 
-      if (res?.message === "Account created successfully") {
+      // if (res?.message === "Account created successfully") {
         // navigate("/register-success");
-      }
+      // }
+      navigate("/account/register-success");
     } catch (error) {
       console.log(error);
     }
@@ -110,7 +111,7 @@ function CreateAccount() {
         {/* Submit Button */}
         <button
           type="submit"
-          className="w-full mt-2 border border-black bg-black text-white py-3 font-medium transition-all duration-200 hover:bg-white hover:text-black active:scale-[0.99]"
+          className="w-full mt-2 border border-black bg-black text-white py-3 font-medium transition-all duration-200 hover:bg-white hover:text-black active:scale-[0.99] hover:cursor-pointer"
         >
           Create Account
         </button>
