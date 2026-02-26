@@ -1,7 +1,7 @@
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
 const User = require("../models/User");
-const { mailPassword } = require("../utils/sentMain");
+const { mailPassword } = require("../utils/sentMail");
 
 const createManager = async (req, res) => {
     const { name, email } = req.body
