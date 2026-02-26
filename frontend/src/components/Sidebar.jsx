@@ -7,7 +7,7 @@ function Sidebar({ isOpen, setIsOpen }) {
   const [searchResults, setSearchResults] = useState([]);
 
   const user = {
-    role: "MANAGER",
+    role: "ADMIN",
   };
 
   const linksByRole = {
@@ -17,7 +17,7 @@ function Sidebar({ isOpen, setIsOpen }) {
         name: "Users",
         children: [
           { name: "Employees", path: "/dashboard/users/employees" },
-          { name: "Managers", path: "/dashboard/users/managers" },
+          { name: "Managers", path: "/dashboard/managers" },
         ],
       },
       {
