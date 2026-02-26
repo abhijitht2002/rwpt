@@ -7,6 +7,10 @@ import CreateAccount from "./pages/register/CreateAccount";
 import Layout from "./layout/Layout";
 import Login from "./pages/login/Login";
 import Success from "./pages/register/Success";
+import Dashboard from "./layout/Dashboard";
+import Summary from "./pages/summary/Summary";
+import Profile from "./pages/profile/Profile";
+import Notes from "./pages/notes/Notes";
 
 function App() {
   return (
@@ -22,10 +26,11 @@ function App() {
         <Route path="register-success" element={<Success />} />
       </Route>
 
-      {/* <Route path="/dashboard" element={<Dashboard />}>
-        <Route path="summary" element={<summary />} />
+      <Route path="/dashboard" element={<Dashboard />}>
+        <Route path="summary" element={<Summary />} />
         <Route path="profile" element={<Profile />} />
-      </Route> */}
+        <Route path="notes" element={<Notes />} />
+      </Route>
     </Routes>
   );
 }
