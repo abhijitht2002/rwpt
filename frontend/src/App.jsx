@@ -12,6 +12,9 @@ import Summary from "./pages/summary/Summary";
 import Profile from "./pages/profile/Profile";
 import Notes from "./pages/notes/Notes";
 import Managers from "./pages/admin/Managers";
+import Employees from "./pages/admin/Employees";
+import Manager from "./pages/admin/Manager";
+import Employee from "./pages/admin/Employee";
 
 function App() {
   return (
@@ -30,6 +33,9 @@ function App() {
       <Route path="/dashboard" element={<Dashboard />}>
         <Route path="summary" element={<Summary />} />
         <Route path="managers" element={<Managers />} />
+        <Route path="manager" element={<Manager />} />
+        <Route path="employees" element={<Employees />} />
+        <Route path="employee" element={<Employee />} />
         <Route path="profile" element={<Profile />} />
         <Route path="notes" element={<Notes />} />
       </Route>

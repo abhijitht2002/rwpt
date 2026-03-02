@@ -3,16 +3,16 @@ import { Link } from "react-router-dom";
 
 function Managers() {
   const managers = [
-    { id: 0, name: "test1", email: "test1@email.com" },
-    { id: 1, name: "test2", email: "test2@email.com" },
-    { id: 2, name: "test3", email: "test3@email.com" },
-    { id: 3, name: "test4", email: "test4@email.com" },
-    { id: 4, name: "test5", email: "test5@email.com" },
-    { id: 5, name: "test6", email: "test6@email.com" },
-    { id: 6, name: "test7", email: "test7@email.com" },
-    { id: 7, name: "test8", email: "test8@email.com" },
-    { id: 8, name: "test9", email: "test9@email.com" },
-    { id: 9, name: "test10", email: "test10@email.com" },
+    { id: 0, name: "test1", email: "test1@email.com", blacklisted: false },
+    { id: 1, name: "test2", email: "test2@email.com", blacklisted: true },
+    { id: 2, name: "test3", email: "test3@email.com", blacklisted: false },
+    { id: 3, name: "test4", email: "test4@email.com", blacklisted: true },
+    { id: 4, name: "test5", email: "test5@email.com", blacklisted: false },
+    { id: 5, name: "test6", email: "test6@email.com", blacklisted: false },
+    { id: 6, name: "test7", email: "test7@email.com", blacklisted: true },
+    { id: 7, name: "test8", email: "test8@email.com", blacklisted: false },
+    { id: 8, name: "test9", email: "test9@email.com", blacklisted: true },
+    { id: 9, name: "test10", email: "test10@email.com", blacklisted: false },
   ];
 
   const handleAddManager = () => {};
@@ -126,6 +126,13 @@ function Managers() {
                         <div className="font-medium text-gray-900">
                           {manager.name}
                         </div>
+
+                        {manager.blacklisted && (
+                          <span className="px-2 py-0.5 text-xs font-medium bg-red-100 text-red-600 border border-red-200 rounded">
+                            Blacklisted
+                          </span>
+                        )}
+
                         <div className="text-sm text-gray-500 mt-1">
                           {manager.email}
                         </div>
@@ -135,7 +142,7 @@ function Managers() {
                     {/* Right Side */}
                     <div className="sm:text-right">
                       <Link
-                        // to={}
+                        to="/dashboard/manager"
                         className="inline-flex items-center text-sm text-gray-600 hover:text-black transition"
                       >
                         View

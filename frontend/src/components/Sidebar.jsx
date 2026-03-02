@@ -1,14 +1,17 @@
 import React, { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 function Sidebar({ isOpen, setIsOpen }) {
+  const { user, loading, logout } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
   const [searchText, setSearchText] = useState("");
   const [searchResults, setSearchResults] = useState([]);
 
-  const user = {
-    role: "ADMIN",
-  };
+  // const user = {
+  //   role: "EMPLOYEE", // ADMIN | MANAGER | EMPLOYEE
+  // };
 
   const linksByRole = {
     ADMIN: [
@@ -16,7 +19,7 @@ function Sidebar({ isOpen, setIsOpen }) {
       {
         name: "Users",
         children: [
-          { name: "Employees", path: "/dashboard/users/employees" },
+          { name: "Employees", path: "/dashboard/employees" },
           { name: "Managers", path: "/dashboard/managers" },
         ],
       },
@@ -190,7 +193,13 @@ function Sidebar({ isOpen, setIsOpen }) {
             <button className="block text-sm text-gray-500 hover:text-black transition">
               Profile
             </button>
-            <button className="block text-sm text-gray-500 hover:text-red-500 transition">
+            <button
+              className="block text-sm text-gray-500 hover:text-red-500 transition"
+              onClick={async () => {
+                await logout();
+                navigate("/account/login");
+              }}
+            >
               Logout
             </button>
           </div>

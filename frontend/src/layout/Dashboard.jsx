@@ -1,9 +1,33 @@
 import React, { useState } from "react";
 import Sidebar from "../components/Sidebar";
 import { Outlet } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 function Dashboard() {
+  const { user, loading } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+
+  if (loading) {
+    return (
+      <div className="flex h-screen bg-white">
+        {/* Sidebar Skeleton */}
+        <div className="w-64 border-r border-gray-200 p-6 space-y-4">
+          <div className="h-6 bg-gray-200 rounded w-40 animate-pulse" />
+          <div className="space-y-3 mt-6">
+            <div className="h-4 bg-gray-200 rounded w-24 animate-pulse" />
+            <div className="h-4 bg-gray-200 rounded w-32 animate-pulse" />
+            <div className="h-4 bg-gray-200 rounded w-28 animate-pulse" />
+          </div>
+        </div>
+
+        {/* Main Content Skeleton */}
+        <div className="flex-1 p-10 space-y-6">
+          <div className="h-8 bg-gray-200 rounded w-48 animate-pulse" />
+          <div className="h-40 bg-gray-200 rounded animate-pulse" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="flex h-screen bg-white text-gray-900">
@@ -37,13 +61,13 @@ function Dashboard() {
           {/* Right Section (Avatar) */}
           <div className="flex items-center gap-4">
             <div className="text-right hidden sm:block">
-              <p className="text-sm font-medium">Admin</p>
+              <p className="text-sm font-medium">{user?.name}</p>
               {/* <p className="text-xs text-gray-500">Workspace</p> */}
             </div>
 
             {/* Avatar */}
             <div className="w-9 h-9 rounded-full border border-gray-300 flex items-center justify-center text-sm font-medium">
-              A
+              {user?.name?.charAt(0)?.toUpperCase() || "U"}
             </div>
           </div>
         </header>

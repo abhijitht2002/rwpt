@@ -1,7 +1,30 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
+import { useState } from "react";
 
 function Login() {
+  const { login, loading } = useAuth();
+  const navigate = useNavigate();
+
+  const [form, setForm] = useState({
+    email: "",
+    password: "",
+  });
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const res = await login(form);
+
+    if (res.success) {
+      alert(res.message || "Login successful");
+      navigate("/dashboard");
+    } else {
+      alert(res.message || "Login failed");
+    }
+  };
+
   return (
     <>
       {/* Heading */}
@@ -37,7 +60,7 @@ function Login() {
       </div>
 
       {/* Form Section */}
-      <form onSubmit={() => {}} className="space-y-5">
+      <form onSubmit={handleSubmit} className="space-y-5">
         {/* Email Field */}
         <div>
           <label htmlFor="email" className="text-sm font-medium text-gray-700">
@@ -49,6 +72,8 @@ function Login() {
             name="email"
             placeholder="Enter your email"
             className="w-full border px-4 py-3 focus:outline-none focus:border-black transition"
+            value={form.email}
+            onChange={(e) => setForm({ ...form, email: e.target.value })}
             required
           />
         </div>
@@ -67,6 +92,8 @@ function Login() {
             name="password"
             placeholder="Enter your password"
             className="w-full border px-4 py-3 focus:outline-none focus:border-black transition"
+            value={form.password}
+            onChange={(e) => setForm({ ...form, password: e.target.value })}
             required
           />
           <Link
@@ -79,9 +106,10 @@ function Login() {
 
         <button
           type="submit"
+          disabled={loading}
           className="w-full mt-2 border border-black bg-black text-white py-3 transition hover:bg-white hover:text-black hover:cursor-pointer"
         >
-          Login →
+          {loading ? "Logging in..." : "Login →"}
         </button>
       </form>
 

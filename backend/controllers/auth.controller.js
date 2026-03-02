@@ -2,6 +2,7 @@ const User = require("../models/User");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const env = require("../config/env");
+const { generateAccessToken, generateRefreshToken } = require("../utils/token");
 
 const register = async (req, res) => {
   try {
@@ -29,24 +30,92 @@ const register = async (req, res) => {
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
+    if (!email || !password) {
+      return res.status(401).json({ message: "Fields required" });
+    }
+
     const user = await User.findOne({ email });
+    if (!user) return res.status(401).json({ message: "Invalid credentials" });
 
-    if (!user) return res.status(401).json({ error: "Invalid credentials" });
+    const isMatch = await bcrypt.compare(password, user.passwordHash);
+    if (!isMatch)
+      return res.status(401).json({ message: "Invalid credentials" });
 
-    if (!bcrypt.compare(password, user.passwordHash))
-      return res.status(401).json({ error: "Invalid credentials" });
+    const accessToken = generateAccessToken(user);
+    const refreshToken = generateRefreshToken(user);
 
-    const token = await jwt.sign(
-      { id: user._id, name: user.name, role: user.role },
-      env.secretKey,
-      { expiresIn: "1h" },
-    );
+    // Store refresh token in httpOnly cookie
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: env.NODE_ENV === "production",
+      sameSite: "Strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000, // 7days
+    })
 
-    res.status(201).json({ message: "Login Successful", token });
+    res.status(200).json({
+      success: true,
+      message: "Login Successful",
+      accessToken,
+      user: {
+        id: user._id,
+        name: user.name,
+        role: user.role,
+      },
+    });
   } catch (err) {
     console.log("Error login", err);
-    res.status(404).json({ error: "Login failed" });
+    res.status(404).json({ message: "Login failed" });
   }
 };
 
-module.exports = { register, login };
+const refresh = async (req, res) => {
+  const token = req.cookies.refreshToken;
+  if (!token) return res.sendStatus(401);
+
+  try {
+    const decoded = jwt.verify(
+      token,
+      env.REFRESH_TOKEN_SECRET
+    );
+
+    const user = await User.findById(decoded.id);
+    if (!user) return res.sendStatus(401);
+
+    const newAccessToken = generateAccessToken(user);
+
+    res.json({ accessToken: newAccessToken });
+  } catch (err) {
+    res.sendStatus(403);
+  }
+}
+
+const logout = (req, res) => {
+  res.clearCookie("refreshToken", {
+    httpOnly: true,
+    sameSite: "Strict",
+    secure: env.NODE_ENV === "production",
+  });
+  res.json({ message: "Logged out successfully" });
+}
+
+const getMe = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select("-passwordHash");
+
+    if (!user) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    res.status(200).json({
+      user: {
+        id: user._id,
+        name: user.name,
+        role: user.role,
+      },
+    });
+  } catch (err) {
+    res.status(401).json({ message: "Unauthorized" });
+  }
+};
+
+module.exports = { register, login, refresh, logout, getMe };
