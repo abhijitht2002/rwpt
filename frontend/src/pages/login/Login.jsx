@@ -2,6 +2,7 @@ import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useState } from "react";
+import toast from "react-hot-toast";
 
 function Login() {
   const { login, loading } = useAuth();
@@ -18,10 +19,10 @@ function Login() {
     const res = await login(form);
 
     if (res.success) {
-      alert(res.message || "Login successful");
+      toast.success(res.message || "Login successful");
       navigate("/dashboard");
     } else {
-      alert(res.message || "Login failed");
+      toast.error(res.message || "Login failed");
     }
   };
 

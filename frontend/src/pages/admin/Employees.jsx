@@ -1,19 +1,35 @@
 import React from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { listEmployees } from "./admin.api";
 
 function Employees() {
-  const employees = [
-    { id: 0, name: "test1", email: "test1@email.com", blacklisted: false },
-    { id: 1, name: "test2", email: "test2@email.com", blacklisted: true },
-    { id: 2, name: "test3", email: "test3@email.com", blacklisted: false },
-    { id: 3, name: "test4", email: "test4@email.com", blacklisted: true },
-    { id: 4, name: "test5", email: "test5@email.com", blacklisted: false },
-    { id: 5, name: "test6", email: "test6@email.com", blacklisted: false },
-    { id: 6, name: "test7", email: "test7@email.com", blacklisted: true },
-    { id: 7, name: "test8", email: "test8@email.com", blacklisted: false },
-    { id: 8, name: "test9", email: "test9@email.com", blacklisted: true },
-    { id: 9, name: "test10", email: "test10@email.com", blacklisted: false },
-  ];
+  const [employees, setEmployees] = useState([])
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+  const pages = []
+  for (let i = 1; i <= totalPages; i++) {
+    pages.push(i);
+  }
+
+  const fetchEmployees = async () => {
+    try {
+      const data = await listEmployees(page, 5);
+      console.log(data);
+
+      setEmployees(data.data);
+      setTotal(data.pagination.total)
+      setTotalPages(data.pagination.totalPages)
+    } catch (err) {
+      console.error("Error fetching employees:", err);
+      setEmployees([]);
+    }
+  };
+
+  useEffect(() => {
+    fetchEmployees()
+  }, [page])
 
   return (
     <div>
@@ -21,7 +37,7 @@ function Employees() {
         <div className="flex items-center justify-between mb-8">
           <h2 className="text-xl font-medium">Employees</h2>
           <span className="text-sm text-gray-500">
-            {employees.length} total
+            {total} total
           </span>
         </div>
 
@@ -44,7 +60,7 @@ function Employees() {
             </div>
           ) : (
             employees.map((employee) => (
-              <div key={employee.id} className="group border-b border-gray-200">
+              <div key={employee._id} className="group border-b border-gray-200">
                 <div className="p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 hover:bg-gray-50 transition">
                   {/* Left Side */}
                   <div className="flex items-start sm:items-center gap-4">
@@ -59,9 +75,9 @@ function Employees() {
                         {employee.name}
                       </div>
 
-                      {employee.blacklisted && (
+                      {employee.status === "BLOCKED" && (
                         <span className="px-2 py-0.5 text-xs font-medium bg-red-100 text-red-600 border border-red-200 rounded">
-                          Blacklisted
+                          Blocked
                         </span>
                       )}
 
@@ -74,7 +90,7 @@ function Employees() {
                   {/* Right Side */}
                   <div className="sm:text-right">
                     <Link
-                      to="/dashboard/employee"
+                      to={`/dashboard/employees/${employee._id}`}
                       className="inline-flex items-center text-sm text-gray-600 hover:text-black transition"
                     >
                       View
@@ -93,32 +109,54 @@ function Employees() {
         <div className="mt-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           {/* Left - Showing info */}
           <div className="text-sm text-gray-500 text-center sm:text-left">
-            Showing 1–10 of 48 employees
+            Showing {(page - 1) * 5 + 1}–
+            {Math.min(page * 5, total)} of {total} employees
           </div>
 
           {/* Right - Controls */}
           <div className="w-full sm:w-auto">
             <div className="flex flex-wrap items-center justify-center sm:justify-end gap-2 text-sm">
               {/* Previous */}
-              <button className="px-3 py-1 border border-gray-300 text-gray-600 hover:bg-gray-100 transition">
+              <button
+                disabled={page === 1}
+                onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+                className={`px-3 py-1 border transition ${page === 1
+                  ? "border-gray-200 text-gray-400 bg-gray-50 cursor-not-allowed"
+                  : "border-gray-300 text-gray-600 hover:bg-gray-100"
+                  }`}
+              >
                 Previous
               </button>
 
               {/* Page Numbers */}
               <div className="flex flex-wrap items-center gap-1">
-                <button className="px-3 py-1 border border-black bg-black text-white">
-                  1
-                </button>
-                <button className="px-3 py-1 border border-gray-300 hover:bg-gray-100 transition">
-                  2
-                </button>
-                <button className="px-3 py-1 border border-gray-300 hover:bg-gray-100 transition">
-                  3
-                </button>
+                {
+                  pages.map((p) =>
+                  (
+                    <button key={p}
+                      onClick={() => setPage(p)}
+                      className={`px-3 py-1 border transition ${page === p
+                        ? "border-black bg-black text-white"
+                        : "border-gray-300 hover:bg-gray-100"
+                        }`}
+                    >
+                      {p}
+                    </button>
+                  )
+                  )
+                }
+
               </div>
 
               {/* Next */}
-              <button className="px-3 py-1 border border-gray-300 text-gray-600 hover:bg-gray-100 transition">
+              <button
+                disabled={page === totalPages}
+                onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
+                className={`px-3 py-1 border transition ${page === totalPages
+                  ? "border-gray-200 text-gray-400 bg-gray-50 cursor-not-allowed"
+                  : "border-gray-300 text-gray-600 hover:bg-gray-100"
+                  }`}
+              >
                 Next
               </button>
             </div>

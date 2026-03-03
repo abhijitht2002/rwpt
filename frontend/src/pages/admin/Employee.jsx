@@ -1,7 +1,33 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { getEmployeeById } from "./admin.api";
 
 function Employee() {
+  const { id } = useParams();
+  const [employee, setEmployee] = useState(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchEmployee = async () => {
+      try {
+        const data = await getEmployeeById(id)
+        console.log("data: ", data.employee);
+        console.log("name: ", data.employee.name);
+
+        setEmployee(data.employee)
+      } catch (error) {
+        console.error("Error fetching employee:", error);
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchEmployee()
+  }, [id])
+
+  if (loading) return <p>Loading...</p>;
+
   return (
     <div className="min-h-screen bg-white text-gray-900">
       <div>
@@ -72,13 +98,13 @@ function Employee() {
             </div>
 
             <div>
-              <h2 className="text-2xl font-medium">Employee Name</h2>
-              <p className="text-gray-500 mt-2">employee@email.com</p>
+              <h2 className="text-2xl font-medium">{employee?.name}</h2>
+              <p className="text-gray-500 mt-2">{employee?.email}</p>
 
               <div className="mt-4 text-sm text-gray-600">
-                Role: Employee <br />
+                Role: {employee?.role} <br />
                 Assigned Manager: Manager Name <br />
-                Status: Active
+                Status: {employee?.status}
               </div>
             </div>
           </div>
@@ -91,12 +117,12 @@ function Employee() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
             <div>
               <p className="text-gray-500">Full Name</p>
-              <p className="mt-1 font-medium">Employee Name</p>
+              <p className="mt-1 font-medium">{employee?.name}</p>
             </div>
 
             <div>
               <p className="text-gray-500">Email</p>
-              <p className="mt-1 font-medium">employee@email.com</p>
+              <p className="mt-1 font-medium">{employee?.email}</p>
             </div>
 
             <div>

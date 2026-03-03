@@ -1,21 +1,68 @@
 import React from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
+import { createManager, listManagers } from "./admin.api";
+import { useEffect } from "react";
+import toast from "react-hot-toast";
 
 function Managers() {
-  const managers = [
-    { id: 0, name: "test1", email: "test1@email.com", blacklisted: false },
-    { id: 1, name: "test2", email: "test2@email.com", blacklisted: true },
-    { id: 2, name: "test3", email: "test3@email.com", blacklisted: false },
-    { id: 3, name: "test4", email: "test4@email.com", blacklisted: true },
-    { id: 4, name: "test5", email: "test5@email.com", blacklisted: false },
-    { id: 5, name: "test6", email: "test6@email.com", blacklisted: false },
-    { id: 6, name: "test7", email: "test7@email.com", blacklisted: true },
-    { id: 7, name: "test8", email: "test8@email.com", blacklisted: false },
-    { id: 8, name: "test9", email: "test9@email.com", blacklisted: true },
-    { id: 9, name: "test10", email: "test10@email.com", blacklisted: false },
-  ];
+  const [managers, setManagers] = useState([])
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+  })
+  const [page, setPage] = useState(1);
+  const [total, setTotal] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+  const pages = []
+  for (let i = 1; i <= totalPages; i++) {
+    pages.push(i);
+  }
+  const [creating, setCreating] = useState(false);
 
-  const handleAddManager = () => {};
+  const fetchManagers = async () => {
+    try {
+      const data = await listManagers(page, 5);
+      console.log(data);
+      console.log("pagination: ", data.pagination);
+
+      setManagers(data.data);
+      setTotal(data.pagination.total)
+      setTotalPages(data.pagination.totalPages)
+    } catch (err) {
+      console.error("Error fetching employees:", err);
+      setManagers([]);
+    }
+  };
+
+  useEffect(() => {
+    fetchManagers()
+  }, [page])
+
+  const handleAddManager = async (e) => {
+    e.preventDefault();
+
+    setCreating(true)
+
+    try {
+      await toast.promise(
+        createManager(form),
+        {
+          loading: "Creating manager...",
+          success: (res) => {
+            fetchManagers();
+            setForm({ name: "", email: "" });
+            return res.message || "Manager created successfully";
+          },
+          error: (err) =>
+            err.response?.data?.message || "Failed to create manager",
+        }
+      )
+    } finally {
+      setCreating(false);
+    }
+
+  };
 
   return (
     <div className="min-h-screen bg-white text-gray-900">
@@ -48,9 +95,11 @@ function Managers() {
               <input
                 type="text"
                 name="name"
-                required
-                className="mt-2 px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-black"
+                value={form.name}
+                onChange={(e) => setForm({ ...form, name: e.target.value })}
                 placeholder="Enter manager name"
+                className="mt-2 px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-black"
+                required
               />
             </div>
 
@@ -60,9 +109,11 @@ function Managers() {
               <input
                 type="email"
                 name="email"
-                required
-                className="mt-2 px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-black"
+                value={form.email}
+                onChange={(e) => setForm({ ...form, email: e.target.value })}
                 placeholder="Enter manager email"
+                className="mt-2 px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-black"
+                required
               />
             </div>
 
@@ -70,8 +121,10 @@ function Managers() {
             <div className="md:col-span-2">
               <button
                 type="submit"
+                disabled={creating}
                 className="px-6 py-2 border border-black text-black hover:bg-black hover:text-white transition text-sm"
               >
+                {/* {creating ? "creating..." : "Add Manager"} */}
                 Add Manager
               </button>
             </div>
@@ -86,7 +139,7 @@ function Managers() {
           <div className="flex items-center justify-between mb-8">
             <h2 className="text-xl font-medium">Managers</h2>
             <span className="text-sm text-gray-500">
-              {managers.length} total
+              {total} total
             </span>
           </div>
 
@@ -110,7 +163,7 @@ function Managers() {
             ) : (
               managers.map((manager) => (
                 <div
-                  key={manager.id}
+                  key={manager._id}
                   className="group border-b border-gray-200"
                 >
                   <div className="p-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 hover:bg-gray-50 transition">
@@ -127,9 +180,9 @@ function Managers() {
                           {manager.name}
                         </div>
 
-                        {manager.blacklisted && (
+                        {manager.status === "BLOCKED" && (
                           <span className="px-2 py-0.5 text-xs font-medium bg-red-100 text-red-600 border border-red-200 rounded">
-                            Blacklisted
+                            Blocked
                           </span>
                         )}
 
@@ -161,32 +214,54 @@ function Managers() {
           <div className="mt-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             {/* Left - Showing info */}
             <div className="text-sm text-gray-500 text-center sm:text-left">
-              Showing 1–10 of 48 managers
+              Showing {(page - 1) * 5 + 1}–
+              {Math.min(page * 5, total)} of {total} managers
             </div>
 
             {/* Right - Controls */}
             <div className="w-full sm:w-auto">
               <div className="flex flex-wrap items-center justify-center sm:justify-end gap-2 text-sm">
                 {/* Previous */}
-                <button className="px-3 py-1 border border-gray-300 text-gray-600 hover:bg-gray-100 transition">
+                <button
+                  disabled={page === 1}
+                  onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+                  className={`px-3 py-1 border transition ${page === 1
+                    ? "border-gray-200 text-gray-400 bg-gray-50 cursor-not-allowed"
+                    : "border-gray-300 text-gray-600 hover:bg-gray-100"
+                    }`}
+                >
                   Previous
                 </button>
 
                 {/* Page Numbers */}
                 <div className="flex flex-wrap items-center gap-1">
-                  <button className="px-3 py-1 border border-black bg-black text-white">
-                    1
-                  </button>
-                  <button className="px-3 py-1 border border-gray-300 hover:bg-gray-100 transition">
-                    2
-                  </button>
-                  <button className="px-3 py-1 border border-gray-300 hover:bg-gray-100 transition">
-                    3
-                  </button>
+                  {
+                    pages.map((p) =>
+                    (
+                      <button key={p}
+                        onClick={() => setPage(p)}
+                        className={`px-3 py-1 border transition ${page === p
+                          ? "border-black bg-black text-white"
+                          : "border-gray-300 hover:bg-gray-100"
+                          }`}
+                      >
+                        {p}
+                      </button>
+                    )
+                    )
+                  }
+
                 </div>
 
                 {/* Next */}
-                <button className="px-3 py-1 border border-gray-300 text-gray-600 hover:bg-gray-100 transition">
+                <button
+                  disabled={page === totalPages}
+                  onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
+                  className={`px-3 py-1 border transition ${page === totalPages
+                    ? "border-gray-200 text-gray-400 bg-gray-50 cursor-not-allowed"
+                    : "border-gray-300 text-gray-600 hover:bg-gray-100"
+                    }`}
+                >
                   Next
                 </button>
               </div>

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import toast from "react-hot-toast";
 
 function Sidebar({ isOpen, setIsOpen }) {
   const { user, loading, logout } = useAuth();
@@ -8,10 +9,6 @@ function Sidebar({ isOpen, setIsOpen }) {
   const navigate = useNavigate();
   const [searchText, setSearchText] = useState("");
   const [searchResults, setSearchResults] = useState([]);
-
-  // const user = {
-  //   role: "EMPLOYEE", // ADMIN | MANAGER | EMPLOYEE
-  // };
 
   const linksByRole = {
     ADMIN: [
@@ -197,6 +194,7 @@ function Sidebar({ isOpen, setIsOpen }) {
               className="block text-sm text-gray-500 hover:text-red-500 transition"
               onClick={async () => {
                 await logout();
+                toast.success("Logged out of the system")
                 navigate("/account/login");
               }}
             >

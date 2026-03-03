@@ -1,11 +1,14 @@
 import React, { useState } from "react";
 import Sidebar from "../components/Sidebar";
-import { Outlet } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import toast from "react-hot-toast";
 
 function Dashboard() {
-  const { user, loading } = useAuth();
+  const { user, loading, logout } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const [isAvatar, setIsAvatar] = useState(false)
+  const navigate = useNavigate()
 
   if (loading) {
     return (
@@ -66,9 +69,31 @@ function Dashboard() {
             </div>
 
             {/* Avatar */}
-            <div className="w-9 h-9 rounded-full border border-gray-300 flex items-center justify-center text-sm font-medium">
+            <button className="w-9 h-9 rounded-full border border-gray-300 flex items-center justify-center text-sm font-medium"
+              onClick={() => { setIsAvatar((prev) => !prev) }}>
               {user?.name?.charAt(0)?.toUpperCase() || "U"}
-            </div>
+            </button>
+
+            {isAvatar && (
+              <div className="absolute right-5 top-16 w-40 bg-white border border-gray-200 rounded-lg shadow-lg py-2 z-50">
+                <button
+                  className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 transition"
+                >
+                  Profile
+                </button>
+
+                <button
+                  className="w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-gray-100 transition"
+                  onClick={async () => {
+                    await logout();
+                    toast.success("Logged out of the system")
+                    navigate("/account/login");
+                  }}
+                >
+                  Logout
+                </button>
+              </div>
+            )}
           </div>
         </header>
 
@@ -77,7 +102,7 @@ function Dashboard() {
           <Outlet />
         </main>
       </div>
-    </div>
+    </div >
   );
 }
 

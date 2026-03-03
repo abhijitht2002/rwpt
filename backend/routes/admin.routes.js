@@ -1,7 +1,12 @@
 const express = require("express");
 const router = express.Router();
-const { createManager } = require("../controllers/admin.controller");
+const { createManager, listManagers, getManagerById, getEmployeeById, listEmployees } = require("../controllers/admin.controller");
+const { protect, role } = require("../middlewares/auth.middleware");
 
-router.post("/managers", createManager);
+router.post("/managers", protect, role("ADMIN"), createManager);
+router.get("/managers", protect, role("ADMIN"), listManagers);
+router.get("/managers/:id", protect, role("ADMIN"), getManagerById);
+router.get("/employees", protect, role("ADMIN"), listEmployees);
+router.get("/employees/:id", protect, role("ADMIN"), getEmployeeById);
 
 module.exports = router;

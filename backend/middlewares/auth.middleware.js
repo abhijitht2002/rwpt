@@ -13,7 +13,7 @@ const protect = (req, res, next) => {
     try {
         const decoded = jwt.verify(token, env.ACCESS_TOKEN_SECRET);
 
-        req.user = { id: decoded.id };
+        req.user = decoded;
 
         next();
     } catch (err) {
@@ -21,4 +21,14 @@ const protect = (req, res, next) => {
     }
 };
 
-module.exports = protect;
+const role = (...allowedRoles) => {
+    return (req, res, next) => {
+        if (!req.user || !allowedRoles.includes(req.user.role)) {
+            return res.status(403).json({ message: "Access denied" });
+        }
+
+        next();
+    };
+}
+
+module.exports = { protect, role };
