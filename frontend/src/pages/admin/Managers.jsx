@@ -195,7 +195,7 @@ function Managers() {
                     {/* Right Side */}
                     <div className="sm:text-right">
                       <Link
-                        to="/dashboard/manager"
+                        to={`/dashboard/managers/${manager._id}`}
                         className="inline-flex items-center text-sm text-gray-600 hover:text-black transition"
                       >
                         View

@@ -1,7 +1,32 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useParams } from "react-router-dom";
+import { getManagerById } from "./admin.api";
 
 function Manager() {
+  const { id } = useParams();
+  const [manager, setManager] = useState(null)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchManager = async () => {
+      try {
+        const data = await getManagerById(id)
+        console.log(data);
+
+        setManager(data.manager)
+      } catch (error) {
+        console.error("Error fetching manager:", error);
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchManager()
+  }, [id])
+
+  if (loading) return <p>Loading...</p>;
+
   return (
     <div className="min-h-screen bg-white text-gray-900">
       {/* HEADER */}
@@ -82,18 +107,18 @@ function Manager() {
         <div className="flex flex-col sm:flex-row sm:items-start gap-6">
           {/* Avatar */}
           <div className="w-16 h-16 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-xl font-medium text-gray-700 shrink-0">
-            M
+            {manager?.name.charAt(0).toUpperCase()}
           </div>
 
           {/* Basic Info */}
           <div>
-            <h2 className="text-xl sm:text-2xl font-medium">Manager Name</h2>
-            <p className="text-gray-500 mt-2 text-sm">manager@email.com</p>
+            <h2 className="text-xl sm:text-2xl font-medium">{manager?.name}</h2>
+            <p className="text-gray-500 mt-2 text-sm">{manager?.email}</p>
 
             <div className="mt-4 text-sm text-gray-600">
-              Role: Manager <br />
+              Role: {manager?.role.toLowerCase()} <br />
               Joined: Jan 12, 2025 <br />
-              Status: Active
+              Status: {manager?.status.toLowerCase()}
             </div>
           </div>
         </div>
@@ -108,12 +133,12 @@ function Manager() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
           <div>
             <p className="text-gray-500">Full Name</p>
-            <p className="mt-1 font-medium">Manager Name</p>
+            <p className="mt-1 font-medium">{manager?.name}</p>
           </div>
 
           <div>
             <p className="text-gray-500">Email</p>
-            <p className="mt-1 font-medium">manager@email.com</p>
+            <p className="mt-1 font-medium">{manager?.email}</p>
           </div>
 
           <div>

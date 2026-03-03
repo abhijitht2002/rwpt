@@ -27,3 +27,9 @@ export const listManagers = async (page = 1, limit = 10) => {
     console.log(res);
     return res.data
 }
+
+export const getManagerById = async (id) => {
+    const res = await API.get(`/admin/managers/${id}`)
+    console.log(res);
+    return res.data
+}
