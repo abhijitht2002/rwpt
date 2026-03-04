@@ -54,7 +54,7 @@ function TasksPage() {
 
     return (
         <div>
-            {isManager && filter !== "closed" && (<section className="border border-gray-200 p-8">
+            {isManager && filter !== "closed" && (<section className="border border-gray-200 p-8 mb-12">
                 <h2 className="text-xl font-medium">Create a task</h2>
                 <p className="mt-2 text-sm text-gray-600">
                     Provide the manager's name and email to grant access to the system.
@@ -104,17 +104,15 @@ function TasksPage() {
                         </button>
                     </div>
                 </form>
-                {/* horizontal divider */}
-
             </section>)}
 
             {/* taskslist */}
-            <section className="mt-12">
+            <section className="">
                 {/* Header */}
                 <div>
                     <div className="flex items-center gap-4">
                         <h2 className="text-lg font-semibold text-gray-800 whitespace-nowrap">
-                            Tasks
+                            {filter.charAt(0).toUpperCase() + filter.slice(1).toLowerCase()} Tasks
                         </h2>
 
                         {/* Expanding line */}
@@ -138,10 +136,10 @@ function TasksPage() {
                             onClick={() => navigate(`/dashboard/task/${task._id}`)}
                             className="flex flex-col sm:flex-row sm:items-center sm:justify-between
   px-4 sm:px-6 py-4
-  bg-gray-100/80
+  bg-gray-90/80
   border-b border-gray-200
   transition-all duration-200 ease-out
-  hover:shadow-sm
+  hover:shadow-md
   hover:-translate-y-[1px]
   cursor-pointer"
                         >

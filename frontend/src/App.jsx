@@ -37,10 +37,10 @@ function App() {
         <Route path="managers/:id" element={<Manager />} />
         <Route path="employees" element={<Employees />} />
         <Route path="employees/:id" element={<Employee />} />
-        <Route path="profile" element={<Profile />} />
 
         <Route path="tasks/:filter" element={<TasksPage />} />
 
+        <Route path="profile" element={<Profile />} />
         <Route path="notes" element={<Notes />} />
       </Route>
     </Routes>
