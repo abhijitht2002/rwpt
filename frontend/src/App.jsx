@@ -15,6 +15,7 @@ import Managers from "./pages/admin/Managers";
 import Employees from "./pages/admin/Employees";
 import Manager from "./pages/admin/Manager";
 import Employee from "./pages/admin/Employee";
+import TasksPage from "./pages/task/TasksPage";
 
 function App() {
   return (
@@ -37,6 +38,9 @@ function App() {
         <Route path="employees" element={<Employees />} />
         <Route path="employees/:id" element={<Employee />} />
         <Route path="profile" element={<Profile />} />
+
+        <Route path="tasks/:filter" element={<TasksPage />} />
+
         <Route path="notes" element={<Notes />} />
       </Route>
     </Routes>

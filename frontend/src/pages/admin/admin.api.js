@@ -33,3 +33,5 @@ export const getManagerById = async (id) => {
     console.log(res);
     return res.data
 }
+
+
