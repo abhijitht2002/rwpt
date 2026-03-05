@@ -1,12 +1,14 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useEffect, useState } from "react";
+import CreateTask from "../../components/CreateTask";
 
 function TasksPage() {
     const { filter } = useParams();
     const { user } = useAuth()
     const [tasks, setTasks] = useState([])
     const navigate = useNavigate()
+    const [assignModal, setAssignModal] = useState(false);
     const [page, setPage] = useState(1);
     const [total, setTotal] = useState(0);
     const [totalPages, setTotalPages] = useState(1);
@@ -54,57 +56,7 @@ function TasksPage() {
 
     return (
         <div>
-            {isManager && filter !== "closed" && (<section className="border border-gray-200 p-8 mb-12">
-                <h2 className="text-xl font-medium">Create a task</h2>
-                <p className="mt-2 text-sm text-gray-600">
-                    Provide the manager's name and email to grant access to the system.
-                </p>
-
-                <form
-                    // onSubmit={handleAddManager}
-                    className="mt-8 grid md:grid-cols-2 gap-6"
-                >
-                    {/* Name */}
-                    <div className="flex flex-col">
-                        <label className="text-sm font-medium text-gray-700">Name</label>
-                        <input
-                            type="text"
-                            name="name"
-                            // value={form.name}
-                            onChange={(e) => setForm({ ...form, name: e.target.value })}
-                            placeholder="Enter manager name"
-                            className="mt-2 px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-black"
-                            required
-                        />
-                    </div>
-
-                    {/* Email */}
-                    <div className="flex flex-col">
-                        <label className="text-sm font-medium text-gray-700">Email</label>
-                        <input
-                            type="email"
-                            name="email"
-                            // value={form.email}
-                            onChange={(e) => setForm({ ...form, email: e.target.value })}
-                            placeholder="Enter manager email"
-                            className="mt-2 px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-1 focus:ring-black"
-                            required
-                        />
-                    </div>
-
-                    {/* Submit Button */}
-                    <div className="md:col-span-2">
-                        <button
-                            type="submit"
-                            // disabled={creating}
-                            className="px-6 py-2 border border-black text-black hover:bg-black hover:text-white transition text-sm"
-                        >
-                            {/* {creating ? "creating..." : "Add Manager"} */}
-                            Create Task
-                        </button>
-                    </div>
-                </form>
-            </section>)}
+            {isManager && filter !== "closed" && (<CreateTask />)}
 
             {/* taskslist */}
             <section className="">
@@ -223,8 +175,6 @@ function TasksPage() {
                     </div>
                 </div>
             </section>
-
-
         </div>
     );
 }
