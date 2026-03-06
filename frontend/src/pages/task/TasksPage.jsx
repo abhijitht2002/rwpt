@@ -2,13 +2,13 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useEffect, useState } from "react";
 import CreateTask from "../../components/CreateTask";
+import { getTasksAPI } from "../../services/task.service";
 
 function TasksPage() {
     const { filter } = useParams();
     const { user } = useAuth()
     const [tasks, setTasks] = useState([])
     const navigate = useNavigate()
-    const [assignModal, setAssignModal] = useState(false);
     const [page, setPage] = useState(1);
     const [total, setTotal] = useState(0);
     const [totalPages, setTotalPages] = useState(1);
@@ -17,38 +17,23 @@ function TasksPage() {
         pages.push(i);
     }
 
+    const fetchTasks = async () => {
+        try {
+            const data = await getTasksAPI(filter, page, 5);
+            console.log("response task:", data);
+
+            setTasks(data.data);
+            setTotal(data.pagination.total)
+            setTotalPages(data.pagination.totalPages)
+        } catch (err) {
+            console.error("Error fetching employees:", err);
+            setTasks([])
+        }
+    }
+
     useEffect(() => {
-
-        const datas = [{
-            id: 0,
-            title: "Title comes here",
-            description: "Description comes here",
-
-        }, {
-            id: 1,
-            title: "Title comes here",
-            description: "Description comes here",
-
-        }, {
-            id: 2,
-            title: "Title comes here",
-            description: "Description comes here",
-
-        }, {
-            id: 3,
-            title: "Title comes here",
-            description: "Lorem ipsum dolor, sit amet consectetur adipisicing elit. Itaque ipsa magni tempora facere aut suscipit quasi neque sapiente consequuntur explicabo.",
-
-        }, {
-            id: 4,
-            title: "Title comes here",
-            description: "Description comes here",
-
-        }]
-
-        setTasks(datas)
-
-    }, [])
+        fetchTasks()
+    }, [page, filter])
 
     const isManager = user?.role === "MANAGER";
 
@@ -57,7 +42,7 @@ function TasksPage() {
     return (
         <div>
 
-            {isManager && filter !== "closed" && (<CreateTask />)}
+            {isManager && filter !== "closed" && (<CreateTask onTaskCreated={fetchTasks} />)}
 
             {/* taskslist */}
             <section className="">

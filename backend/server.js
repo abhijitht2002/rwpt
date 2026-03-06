@@ -7,6 +7,7 @@ const connectDB = require("./config/db");
 const authRoutes = require("./routes/auth.routes");
 const adminRoutes = require("./routes/admin.routes");
 const tasksRoutes = require("./routes/tasks.routes");
+const managerRoutes = require("./routes/manager.routes")
 
 app.use(express.json());
 
@@ -26,6 +27,7 @@ app.get("/", (req, res) => {
 app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/tasks", tasksRoutes);
+app.use("/api/manager", managerRoutes);
 
 app.listen(env.port, () => {
   console.log(`server is running on http://localhost:${env.port}`);

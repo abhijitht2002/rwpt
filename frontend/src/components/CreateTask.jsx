@@ -1,10 +1,15 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { createTaskAPI, getEmployeesAPI } from "../services/manager.service";
+import toast from "react-hot-toast";
 
-function CreateTask() {
+function CreateTask({ onTaskCreated }) {
     const today = new Date().toISOString().split("T")[0];
 
+    const [employees, setEmployees] = useState([])
     const [open, setOpen] = useState(false);
     const [assignModal, setAssignModal] = useState(false);
+    const [search, setSearch] = useState("")
+    const [saving, setSaving] = useState(false)
 
     const [form, setForm] = useState({
         title: "",
@@ -13,13 +18,59 @@ function CreateTask() {
         due_date: "",
         assigned_to: null,
     });
+    const selectedEmployee = employees.find(
+        (emp) => emp._id === form.assigned_to
+    );
 
-    const employees = [
-        { _id: 1, name: "John Doe", email: "john@email.com" },
-        { _id: 2, name: "Sarah Smith", email: "sarah@email.com" },
-        { _id: 3, name: "David Lee", email: "david@email.com" },
-    ];
+    useEffect(() => {
+        if (!assignModal) return;
 
+        // const timer = setTimeout(async () => {
+        //     const res = await getEmployeesAPI(search);
+        //     setEmployees(res.employees);
+        // }, 300);
+
+        // return () => clearTimeout(timer);
+
+        const fetchEmployees = async () => {
+            const res = await getEmployeesAPI(search)
+            setEmployees(res.employees);
+        };
+
+        fetchEmployees()
+    }, [assignModal, search])
+
+    const handleSubmit = async (e) => {
+        e.preventDefault()
+
+        try {
+            setSaving(true)
+
+            await toast.promise(
+                createTaskAPI(form), {
+                loading: "Creating task...",
+                success: (res) => {
+                    onTaskCreated();
+                    return res.message || "Task created successfully"
+                },
+                error: (err) => err.response?.data?.message || "Failed to create task"
+            });
+
+            setForm({
+                title: "",
+                description: "",
+                start_date: "",
+                due_date: "",
+                assigned_to: null,
+            });
+
+            // setOpen(false);
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setSaving(false)
+        }
+    }
 
     return (
         <>
@@ -48,7 +99,7 @@ function CreateTask() {
                     className={`transition-all duration-300 overflow-hidden ${open ? "max-h-[1000px] p-6 border-t border-gray-200" : "max-h-0"
                         }`}
                 >
-                    <form className="grid md:grid-cols-2 gap-6">
+                    <form onSubmit={handleSubmit} className="grid md:grid-cols-2 gap-6">
 
                         <div className="flex flex-col md:col-span-2">
                             <label className="text-sm font-medium text-gray-700">
@@ -56,6 +107,7 @@ function CreateTask() {
                             </label>
                             <input
                                 type="text"
+                                value={form.title}
                                 placeholder="Enter task title"
                                 onChange={(e) =>
                                     setForm({ ...form, title: e.target.value })
@@ -71,6 +123,7 @@ function CreateTask() {
                             <textarea
                                 rows="4"
                                 placeholder="Enter task description"
+                                value={form.description}
                                 onChange={(e) =>
                                     setForm({
                                         ...form,
@@ -88,6 +141,7 @@ function CreateTask() {
                             <input
                                 type="date"
                                 min={today}
+                                value={form.start_date}
                                 onChange={(e) =>
                                     setForm({
                                         ...form,
@@ -105,6 +159,7 @@ function CreateTask() {
                             <input
                                 type="date"
                                 min={form.start_date || today}
+                                value={form.due_date}
                                 onChange={(e) =>
                                     setForm({
                                         ...form,
@@ -120,24 +175,49 @@ function CreateTask() {
                                 Assigned Employee
                             </label>
 
-                            <button
-                                type="button"
-                                onClick={() => setAssignModal(true)}
-                                className="mt-2 px-4 py-2 border border-gray-300 rounded text-sm text-left hover:bg-gray-50"
-                            >
-                                Select Employee
-                            </button>
+                            <div className="mt-2">
+
+                                {!selectedEmployee ? (
+                                    <button
+                                        type="button"
+                                        onClick={() => setAssignModal(true)}
+                                        value={form.assigned_to}
+                                        className="px-4 py-2 border border-gray-300 rounded text-sm hover:bg-gray-50"
+                                    >
+                                        Select Employee
+                                    </button>
+                                ) : (
+                                    <div className="flex items-center justify-between border border-gray-300 rounded px-3 py-2">
+
+                                        <div>
+                                            <p className="text-sm font-medium">{selectedEmployee.name}</p>
+                                            <p className="text-xs text-gray-500">{selectedEmployee.email}</p>
+                                        </div>
+
+                                        <button
+                                            type="button"
+                                            onClick={() =>
+                                                setForm((prev) => ({ ...prev, assigned_to: null }))
+                                            }
+                                            className="text-red-500 text-sm ml-3"
+                                        >
+                                            ✕
+                                        </button>
+
+                                    </div>
+                                )}
+                            </div>
                         </div>
 
                         <div className="md:col-span-2">
                             <button
                                 type="submit"
+                                disabled={saving}
                                 className="px-6 py-2 border border-black text-black hover:bg-black hover:text-white transition text-sm"
                             >
-                                Create Task
+                                {saving ? "Creating..." : "Create Task"}
                             </button>
                         </div>
-
                     </form>
                 </div>
             </section>
@@ -154,8 +234,8 @@ function CreateTask() {
                         <div className="w-full mt-6">
                             <input
                                 type="text"
-                                //   value={value}
-                                //   onChange={onChange}
+                                value={search}
+                                onChange={(e) => setSearch(e.target.value)}
                                 placeholder="Search employees..."
                                 className="w-full px-4 py-2 border border-gray-300 text-sm rounded 
                    focus:outline-none focus:ring-1 focus:ring-black 
@@ -164,6 +244,11 @@ function CreateTask() {
                         </div>
 
                         <div className="mt-6 space-y-3 max-h-60 overflow-y-auto">
+                            {employees.length === 0 && (
+                                <div>
+                                    <p className="text-sm font-medium text-gray-600">No data found</p>
+                                </div>
+                            )}
                             {employees.map((emp) => (
                                 <div
                                     key={emp._id}
@@ -188,7 +273,10 @@ function CreateTask() {
 
                         <div className="mt-6 flex justify-end">
                             <button
-                                onClick={() => setAssignModal(false)}
+                                onClick={() => {
+                                    setSearch("")
+                                    setAssignModal(false)
+                                }}
                                 className="px-4 py-2 text-sm border border-gray-300 hover:bg-gray-50"
                             >
                                 Cancel

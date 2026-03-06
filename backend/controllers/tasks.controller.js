@@ -1,3 +1,5 @@
+const Task = require("../models/Task");
+
 const listTasks = async (req, res) => {
     try {
         const { filter } = req.params
@@ -7,7 +9,7 @@ const listTasks = async (req, res) => {
         const query = {}
 
         if (req.user.role === "MANAGER") {
-            query.assigned_by = req.user._id
+            query.assigned_by = req.user.id
 
             switch (filter) {
                 case "assigned":
