@@ -28,7 +28,7 @@ const listTasks = async (req, res) => {
                     return res.status(400).json({ message: "Invalid filter" })
             }
         } else if (req.user.role === "EMPLOYEE") {
-            query.assigned_to = req.user._id
+            query.assigned_to = req.user.id
 
             switch (filter) {
                 case "upcoming":
