@@ -56,6 +56,7 @@ function TasksPage() {
 
     return (
         <div>
+
             {isManager && filter !== "closed" && (<CreateTask />)}
 
             {/* taskslist */}

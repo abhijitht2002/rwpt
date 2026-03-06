@@ -98,7 +98,8 @@ function Login() {
             required
           />
           <Link
-            to="/forgot-password"
+            to="/account/verify"
+            state={{ flow: "forgot-password" }}
             className="text-sm text-blue-600 hover:underline"
           >
             Forgot password?
@@ -121,13 +122,14 @@ function Login() {
           New here?{" "}
           <Link
             to="/account/verify"
+            state={{ flow: "register" }}
             className="relative font-medium text-black group"
           >
             Create an account
             <span className="absolute left-0 -bottom-1 h-px w-0 bg-black transition-all duration-300 group-hover:w-full" />
           </Link>
         </p>
-      </div>
+      </div >
     </>
   );
 }

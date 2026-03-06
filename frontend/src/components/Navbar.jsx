@@ -42,6 +42,7 @@ function Navbar() {
 
                 <button
                   className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 transition"
+                  onClick={() => { navigate("/dashboard/account") }}
                 >
                   Profile
                 </button>

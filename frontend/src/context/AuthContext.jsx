@@ -39,10 +39,14 @@ export const AuthProvider = ({ children }) => {
     setLoading(true);
     try {
       const res = await loginAPI(formdata);
-      console.log(res);
+      // console.log(res);
 
-      setUser(res.user);
+      const meRes = await getMeAPI();
+      setUser(meRes.user);
       return { success: true, message: res.message };
+
+      // setUser(res.user);
+      // return { success: true, message: res.message };
     } catch (err) {
       console.log(err);
 

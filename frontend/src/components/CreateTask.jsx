@@ -1,6 +1,9 @@
 import { useState } from "react";
 
 function CreateTask() {
+    const today = new Date().toISOString().split("T")[0];
+
+    const [open, setOpen] = useState(false);
     const [assignModal, setAssignModal] = useState(false);
 
     const [form, setForm] = useState({
@@ -15,108 +18,131 @@ function CreateTask() {
         { _id: 1, name: "John Doe", email: "john@email.com" },
         { _id: 2, name: "Sarah Smith", email: "sarah@email.com" },
         { _id: 3, name: "David Lee", email: "david@email.com" },
-        { _id: 4, name: "John Lee", email: "david@email.com" },
-        { _id: 5, name: "John Lee", email: "david@email.com" },
     ];
+
 
     return (
         <>
-            <section className="border border-gray-200 p-8 mb-12">
-                <h2 className="text-xl font-medium">Create a task</h2>
-                <p className="mt-2 text-sm text-gray-600">
-                    Fill the task details and assign it to an employee.
-                </p>
+            <section className="border border-gray-200 mb-10">
 
-                <form className="mt-8 grid md:grid-cols-2 gap-6">
-                    <div className="flex flex-col md:col-span-2">
-                        <label className="text-sm font-medium text-gray-700">
-                            Title
-                        </label>
-                        <input
-                            type="text"
-                            placeholder="Enter task title"
-                            onChange={(e) =>
-                                setForm({ ...form, title: e.target.value })
-                            }
-                            className="mt-2 px-3 py-2 border border-gray-300 rounded text-sm"
-                        />
+                {/* HEADER BUTTON */}
+                <button
+                    onClick={() => setOpen(!open)}
+                    className="w-full flex items-center justify-between px-6 py-4 hover:bg-gray-50"
+                >
+                    <div className="text-left">
+                        <h2 className="text-lg font-medium">Create Task</h2>
+                        <p className="text-sm text-gray-500">
+                            Assign a task to an employee
+                        </p>
                     </div>
 
-                    <div className="flex flex-col md:col-span-2">
-                        <label className="text-sm font-medium text-gray-700">
-                            Description
-                        </label>
-                        <textarea
-                            rows="4"
-                            placeholder="Enter task description"
-                            onChange={(e) =>
-                                setForm({
-                                    ...form,
-                                    description: e.target.value,
-                                })
-                            }
-                            className="mt-2 px-3 py-2 border border-gray-300 rounded text-sm"
-                        />
-                    </div>
+                    <span className="text-xl">
+                        {open ? "−" : "+"}
+                    </span>
+                </button>
 
-                    <div className="flex flex-col">
-                        <label className="text-sm font-medium text-gray-700">
-                            Start Date
-                        </label>
-                        <input
-                            type="date"
-                            onChange={(e) =>
-                                setForm({
-                                    ...form,
-                                    start_date: e.target.value,
-                                })
-                            }
-                            className="mt-2 px-3 py-2 border border-gray-300 rounded text-sm"
-                        />
-                    </div>
 
-                    <div className="flex flex-col">
-                        <label className="text-sm font-medium text-gray-700">
-                            Due Date
-                        </label>
-                        <input
-                            type="date"
-                            onChange={(e) =>
-                                setForm({
-                                    ...form,
-                                    due_date: e.target.value,
-                                })
-                            }
-                            className="mt-2 px-3 py-2 border border-gray-300 rounded text-sm"
-                        />
-                    </div>
+                {/* COLLAPSIBLE FORM */}
+                <div
+                    className={`transition-all duration-300 overflow-hidden ${open ? "max-h-[1000px] p-6 border-t border-gray-200" : "max-h-0"
+                        }`}
+                >
+                    <form className="grid md:grid-cols-2 gap-6">
 
-                    <div className="flex flex-col md:col-span-2">
-                        <label className="text-sm font-medium text-gray-700">
-                            Assigned Employee
-                        </label>
+                        <div className="flex flex-col md:col-span-2">
+                            <label className="text-sm font-medium text-gray-700">
+                                Title
+                            </label>
+                            <input
+                                type="text"
+                                placeholder="Enter task title"
+                                onChange={(e) =>
+                                    setForm({ ...form, title: e.target.value })
+                                }
+                                className="mt-2 px-3 py-2 border border-gray-300 rounded text-sm"
+                            />
+                        </div>
 
-                        <button
-                            type="button"
-                            onClick={() => setAssignModal(true)}
-                            className="mt-2 px-4 py-2 border border-gray-300 rounded text-sm text-left hover:bg-gray-50"
-                        >
-                            Select Employee
-                        </button>
-                    </div>
+                        <div className="flex flex-col md:col-span-2">
+                            <label className="text-sm font-medium text-gray-700">
+                                Description
+                            </label>
+                            <textarea
+                                rows="4"
+                                placeholder="Enter task description"
+                                onChange={(e) =>
+                                    setForm({
+                                        ...form,
+                                        description: e.target.value,
+                                    })
+                                }
+                                className="mt-2 px-3 py-2 border border-gray-300 rounded text-sm"
+                            />
+                        </div>
 
-                    <div className="md:col-span-2">
-                        <button
-                            type="submit"
-                            className="px-6 py-2 border border-black text-black hover:bg-black hover:text-white transition text-sm"
-                        >
-                            Create Task
-                        </button>
-                    </div>
-                </form>
+                        <div className="flex flex-col">
+                            <label className="text-sm font-medium text-gray-700">
+                                Start Date
+                            </label>
+                            <input
+                                type="date"
+                                min={today}
+                                onChange={(e) =>
+                                    setForm({
+                                        ...form,
+                                        start_date: e.target.value,
+                                    })
+                                }
+                                className="mt-2 px-3 py-2 border border-gray-300 rounded text-sm"
+                            />
+                        </div>
+
+                        <div className="flex flex-col">
+                            <label className="text-sm font-medium text-gray-700">
+                                Due Date
+                            </label>
+                            <input
+                                type="date"
+                                min={form.start_date || today}
+                                onChange={(e) =>
+                                    setForm({
+                                        ...form,
+                                        due_date: e.target.value,
+                                    })
+                                }
+                                className="mt-2 px-3 py-2 border border-gray-300 rounded text-sm"
+                            />
+                        </div>
+
+                        <div className="flex flex-col md:col-span-2">
+                            <label className="text-sm font-medium text-gray-700">
+                                Assigned Employee
+                            </label>
+
+                            <button
+                                type="button"
+                                onClick={() => setAssignModal(true)}
+                                className="mt-2 px-4 py-2 border border-gray-300 rounded text-sm text-left hover:bg-gray-50"
+                            >
+                                Select Employee
+                            </button>
+                        </div>
+
+                        <div className="md:col-span-2">
+                            <button
+                                type="submit"
+                                className="px-6 py-2 border border-black text-black hover:bg-black hover:text-white transition text-sm"
+                            >
+                                Create Task
+                            </button>
+                        </div>
+
+                    </form>
+                </div>
             </section>
 
-            {/* Assign Modal */}
+            {/* Assign Modal (unchanged) */}
             {assignModal && (
                 <div className="fixed inset-0 flex items-center justify-center bg-black/30">
                     <div className="bg-white w-full max-w-md p-6 border border-gray-200">

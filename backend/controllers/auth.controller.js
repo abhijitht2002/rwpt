@@ -112,6 +112,7 @@ const getMe = async (req, res) => {
         id: user._id,
         name: user.name,
         role: user.role,
+        status: user.status
       },
     });
   } catch (err) {

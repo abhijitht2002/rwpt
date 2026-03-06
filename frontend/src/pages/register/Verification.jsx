@@ -1,10 +1,14 @@
 import React from "react";
 import { useEffect } from "react";
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 function Verification() {
-  const [email, setEmail] = useState("");
+  const location = useLocation();
+  const flow = location.state?.flow || "register";
+  const emailFromState = location.state?.email || ""
+
+  const [email, setEmail] = useState(emailFromState);
   const [otp, setOTP] = useState("");
   const [timeLeft, setTimeLeft] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
@@ -40,7 +44,13 @@ function Verification() {
   };
 
   const handleVerify = async () => {
-    navigate("/account/register");
+    if (flow === "register") {
+      navigate("/account/register");
+    }
+
+    if (flow === "forgot-password") {
+      navigate("/account/forgot-password");
+    }
   };
 
   return (
@@ -48,37 +58,39 @@ function Verification() {
       {/* Heading */}
       <div className="space-y-2">
         <h2 className="text-2xl font-semibold tracking-tight">
-          Create your account
+          Verify your account
         </h2>
         <p className="text-sm text-gray-600">
-          Set up your profile to access the platform.
+          We’ll send a one-time code to your email to verify your account.
         </p>
       </div>
 
       {/* Google OAuth */}
-      <div className="mt-6">
-        <button
-          type="button"
-          className="w-full flex items-center justify-center gap-3 border py-3 text-sm font-medium transition hover:bg-black hover:text-white hover:cursor-pointer"
-        >
-          <img
-            src="https://www.svgrepo.com/show/475656/google-color.svg"
-            alt="Google"
-            className="w-5 h-5"
-          />
-          Continue with Google
-        </button>
-      </div>
+      {flow === "register" && (<>
+        <div className="mt-6">
+          <button
+            type="button"
+            className="w-full flex items-center justify-center gap-3 border py-3 text-sm font-medium transition hover:bg-black hover:text-white hover:cursor-pointer"
+          >
+            <img
+              src="https://www.svgrepo.com/show/475656/google-color.svg"
+              alt="Google"
+              className="w-5 h-5"
+            />
+            Continue with Google
+          </button>
+        </div>
 
-      {/* Divider */}
-      <div className="my-6 flex items-center">
-        <div className="flex-1 border-t" />
-        <span className="px-4 text-xs text-gray-500 uppercase">or</span>
-        <div className="flex-1 border-t" />
-      </div>
+        {/* Divider */}
+        <div className="my-6 flex items-center">
+          <div className="flex-1 border-t" />
+          <span className="px-4 text-xs text-gray-500 uppercase">or</span>
+          <div className="flex-1 border-t" />
+        </div>
+      </>)}
 
       {/* Form Section */}
-      <div className="space-y-5">
+      <div className="mt-6 space-y-5">
         {/* Email Field */}
         <div className="space-y-2">
           <label htmlFor="email" className="text-sm font-medium text-gray-700">
@@ -91,7 +103,10 @@ function Verification() {
               type="email"
               name="email"
               placeholder="Enter your email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="w-full border px-4 py-3 pr-32 focus:outline-none focus:border-black transition"
+              readOnly={!!emailFromState}
             />
 
             {/* Send OTP Button */}
@@ -100,11 +115,10 @@ function Verification() {
               onClick={handleGenerate}
               disabled={isRunning}
               className={`absolute right-2 top-1/2 -translate-y-1/2 text-sm font-medium px-4 py-2 transition
-            ${
-              isRunning
-                ? "text-gray-500 cursor-not-allowed"
-                : "border border-black text-black hover:bg-black hover:text-white hover:cursor-pointer"
-            }`}
+            ${isRunning
+                  ? "text-gray-500 cursor-not-allowed"
+                  : "border border-black text-black hover:bg-black hover:text-white hover:cursor-pointer"
+                }`}
             >
               {isRunning ? formatTime(timeLeft) : "Send OTP"}
             </button>
@@ -129,6 +143,8 @@ function Verification() {
               type="text"
               name="otp"
               maxLength={6}
+              value={otp}
+              onChange={(e) => setOTP(e.target.value)}
               placeholder="Enter 6-digit code"
               className="w-full border px-4 py-3 tracking-widest focus:outline-none focus:border-black transition"
             />

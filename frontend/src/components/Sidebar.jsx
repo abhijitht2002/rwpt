@@ -63,9 +63,8 @@ function Sidebar({ isOpen, setIsOpen }) {
     <>
       {/* Mobile Overlay */}
       <div
-        className={`fixed inset-0 bg-black/20 z-20 md:hidden transition ${
-          isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
-        }`}
+        className={`fixed inset-0 bg-black/20 z-20 md:hidden transition ${isOpen ? "opacity-100" : "opacity-0 pointer-events-none"
+          }`}
         onClick={() => setIsOpen(false)}
       />
 
@@ -73,16 +72,14 @@ function Sidebar({ isOpen, setIsOpen }) {
       <aside
         className={`fixed md:relative h-full shrink-0 bg-white border-r border-gray-200 flex flex-col justify-between z-30
   overflow-hidden transition-all duration-300 ease-in-out
-  ${
-    isOpen
-      ? "w-64 translate-x-0 md:w-64"
-      : "w-64 -translate-x-full md:w-0 md:translate-x-0"
-  }`}
+  ${isOpen
+            ? "w-64 translate-x-0 md:w-64"
+            : "w-64 -translate-x-full md:w-0 md:translate-x-0"
+          }`}
       >
         <div
-          className={`flex flex-col h-full ${
-            isOpen ? "opacity-100" : "opacity-0 md:opacity-0"
-          }`}
+          className={`flex flex-col h-full ${isOpen ? "opacity-100" : "opacity-0 md:opacity-0"
+            }`}
         >
           {/* Top / Logo */}
           <div className="px-6 py-6 border-b border-gray-200 flex items-center justify-between">
@@ -157,11 +154,10 @@ function Sidebar({ isOpen, setIsOpen }) {
                         <Link
                           key={child.name}
                           to={child.path}
-                          className={`px-3 py-2 text-sm rounded transition ${
-                            active
-                              ? "bg-gray-100 font-medium"
-                              : "text-gray-700 hover:bg-gray-100"
-                          }`}
+                          className={`px-3 py-2 text-sm rounded transition ${active
+                            ? "bg-gray-100 font-medium"
+                            : "text-gray-700 hover:bg-gray-100"
+                            }`}
                         >
                           {child.name}
                         </Link>
@@ -173,11 +169,10 @@ function Sidebar({ isOpen, setIsOpen }) {
                 <Link
                   key={link.name}
                   to={link.path}
-                  className={`block px-3 py-2 text-sm rounded transition ${
-                    location.pathname === link.path
-                      ? "bg-gray-100 font-medium"
-                      : "text-gray-700 hover:bg-gray-100"
-                  }`}
+                  className={`block px-3 py-2 text-sm rounded transition ${location.pathname === link.path
+                    ? "bg-gray-100 font-medium"
+                    : "text-gray-700 hover:bg-gray-100"
+                    }`}
                 >
                   {link.name}
                 </Link>
@@ -187,7 +182,9 @@ function Sidebar({ isOpen, setIsOpen }) {
 
           {/* Footer */}
           <div className="px-6 py-6 border-t border-gray-200 space-y-2">
-            <button className="block text-sm text-gray-500 hover:text-black transition">
+            <button className="block text-sm text-gray-500 hover:text-black transition"
+              onClick={() => navigate("/dashboard/account")}
+            >
               Profile
             </button>
             <button

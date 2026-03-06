@@ -78,6 +78,7 @@ function Dashboard() {
               <div className="absolute right-5 top-16 w-40 bg-white border border-gray-200 rounded-lg shadow-lg py-2 z-50">
                 <button
                   className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 transition"
+                  onClick={() => { navigate("/dashboard/account") }}
                 >
                   Profile
                 </button>
@@ -96,6 +97,24 @@ function Dashboard() {
             )}
           </div>
         </header>
+
+        {/* risk banner */}
+        {user.role === "MANAGER" && user.status === "INVITED" && (
+          <div className="bg-yellow-50 border-b border-yellow-200 px-4 sm:px-6 lg:px-10 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+
+            <p className="text-sm text-yellow-800">
+              ⚠ Security Notice: You must reset your password immediately to activate your account.
+            </p>
+
+            <button
+              onClick={() => navigate("/dashboard/account/reset-password")}
+              className="text-sm font-medium text-yellow-900 underline hover:text-black self-start sm:self-auto"
+            >
+              Reset Password
+            </button>
+
+          </div>
+        )}
 
         {/* Page Content */}
         <main className="flex-1 overflow-y-auto px-10 py-10">
