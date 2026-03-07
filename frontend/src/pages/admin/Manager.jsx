@@ -6,15 +6,18 @@ import { getManagerById } from "./admin.api";
 function Manager() {
   const { id } = useParams();
   const [manager, setManager] = useState(null)
+  const [stats, setStats] = useState(null)
+  const [employees, setEmployees] = useState([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const fetchManager = async () => {
       try {
         const data = await getManagerById(id)
-        console.log(data);
 
         setManager(data.manager)
+        setStats(data.stats)
+        setEmployees(data.employees)
       } catch (error) {
         console.error("Error fetching manager:", error);
       } finally {
@@ -57,17 +60,17 @@ function Manager() {
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 text-sm">
               <div className="border border-gray-200 p-5 sm:p-6">
                 <p className="text-gray-500">Total</p>
-                <p className="mt-2 text-xl font-medium text-gray-900">24</p>
+                <p className="mt-2 text-xl font-medium text-gray-900">{stats.totalTask}</p>
               </div>
 
               <div className="border border-gray-200 p-5 sm:p-6">
                 <p className="text-gray-500">Completed</p>
-                <p className="mt-2 text-xl font-medium text-gray-900">18</p>
+                <p className="mt-2 text-xl font-medium text-gray-900">{stats.completedTask}</p>
               </div>
 
               <div className="border border-gray-200 p-5 sm:p-6">
-                <p className="text-gray-500">Developing</p>
-                <p className="mt-2 text-xl font-medium text-gray-900">6</p>
+                <p className="text-gray-500">Pending</p>
+                <p className="mt-2 text-xl font-medium text-gray-900">{stats.pendingTask}</p>
               </div>
             </div>
           </div>
@@ -81,25 +84,25 @@ function Manager() {
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 text-sm">
               <div className="border border-gray-200 p-5 sm:p-6">
                 <p className="text-gray-500">Total</p>
-                <p className="mt-2 text-xl font-medium text-gray-900">3</p>
+                <p className="mt-2 text-xl font-medium text-gray-900">{stats.totalEmployees}</p>
               </div>
 
               <div className="border border-gray-200 p-5 sm:p-6">
                 <p className="text-gray-500">Working</p>
-                <p className="mt-2 text-xl font-medium text-gray-900">2</p>
+                <p className="mt-2 text-xl font-medium text-gray-900">{stats.working}</p>
               </div>
 
               <div className="border border-gray-200 p-5 sm:p-6">
                 <p className="text-gray-500">Not working</p>
-                <p className="mt-2 text-xl font-medium text-gray-900">1</p>
+                <p className="mt-2 text-xl font-medium text-gray-900">{stats.notWorking}</p>
               </div>
             </div>
           </div>
         </div>
 
-        <p className="text-sm text-gray-500 mt-6">
+        {/* <p className="text-sm text-gray-500 mt-6">
           Note: Upcoming tasks are excluded from these statistics.
-        </p>
+        </p> */}
       </section>
 
       {/* PROFILE SECTION */}
@@ -114,12 +117,6 @@ function Manager() {
           <div>
             <h2 className="text-xl sm:text-2xl font-medium">{manager?.name}</h2>
             <p className="text-gray-500 mt-2 text-sm">{manager?.email}</p>
-
-            <div className="mt-4 text-sm text-gray-600">
-              Role: {manager?.role.toLowerCase()} <br />
-              Joined: Jan 12, 2025 <br />
-              Status: {manager?.status.toLowerCase()}
-            </div>
           </div>
         </div>
       </section>
@@ -142,13 +139,19 @@ function Manager() {
           </div>
 
           <div>
-            <p className="text-gray-500">Phone</p>
-            <p className="mt-1 font-medium">+91 XXXXX XXXXX</p>
+            <p className="text-gray-500">Role</p>
+            <p className="mt-1 font-medium">{manager?.role
+              ? manager.role.charAt(0).toUpperCase() + manager.role.slice(1).toLowerCase()
+              : "-"}</p>
           </div>
 
           <div>
-            <p className="text-gray-500">Department</p>
-            <p className="mt-1 font-medium">Coming soon</p>
+            <p className="text-gray-500">Joined on</p>
+            <p className="mt-1 font-medium">{new Date(manager.createdAt).toLocaleDateString("en-IN", {
+              year: "numeric",
+              month: "long",
+              day: "numeric",
+            })}</p>
           </div>
         </div>
       </section>
@@ -159,13 +162,15 @@ function Manager() {
           <h2 className="text-lg sm:text-xl font-medium">
             Assigned Employees
           </h2>
-          <span className="text-sm text-gray-500">12 employees</span>
+          <span className="text-sm text-gray-500">{stats.totalEmployees} total</span>
         </div>
 
         <div className="divide-y divide-gray-200">
-          {[1, 2, 3].map((emp) => (
+          {employees.length === 0 ? (<div className="p-6 text-sm text-gray-500">
+            No employeees assigned yet.
+          </div>) : employees.map((emp) => (
             <div
-              key={emp}
+              key={emp._id}
               className="py-5 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"
             >
               {/* Left: Avatar + Info */}
@@ -176,25 +181,25 @@ function Manager() {
 
                 <div className="min-w-0">
                   <p className="font-medium text-gray-900 truncate">
-                    Employee Name
+                    {emp?.name}
                   </p>
                   <p className="text-sm text-gray-500 truncate">
-                    employee@email.com
+                    {emp?.email}
                   </p>
                 </div>
               </div>
 
               {/* Right: Action */}
-              <button className="text-sm text-gray-600 hover:text-black transition w-fit">
-                View →
-              </button>
+              <div className="text-sm text-gray-600 ">
+                {emp.status}
+              </div>
             </div>
           ))}
         </div>
       </section>
 
       {/* ACTIVITY */}
-      <section className="border border-gray-200 p-6 sm:p-8 mb-12">
+      {/* <section className="border border-gray-200 p-6 sm:p-8 mb-12">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-8">
           <h2 className="text-lg sm:text-xl font-medium">Recent Activity</h2>
           <span className="text-sm text-gray-500">Last 7 days</span>
@@ -215,10 +220,10 @@ function Manager() {
             </div>
           ))}
         </div>
-      </section>
+      </section> */}
 
       {/* REPORTS */}
-      <section className="border border-gray-200 p-6 sm:p-8 mb-12">
+      {/* <section className="border border-gray-200 p-6 sm:p-8 mb-12">
         <div className="flex items-center justify-between mb-8">
           <h2 className="text-lg sm:text-xl font-medium">Reports</h2>
         </div>
@@ -244,10 +249,10 @@ function Manager() {
             </div>
           ))}
         </div>
-      </section>
+      </section> */}
 
       {/* TIMELINE */}
-      <section className="border border-gray-200 p-6 sm:p-8 mb-12">
+      {/* <section className="border border-gray-200 p-6 sm:p-8 mb-12">
         <div className="flex items-center justify-between mb-8">
           <h2 className="text-lg sm:text-xl font-medium">Timeline</h2>
         </div>
@@ -270,7 +275,7 @@ function Manager() {
             </div>
           ))}
         </div>
-      </section>
+      </section> */}
 
       {/* danger */}
       <section className="mb-12 border border-red-200 bg-red-50 p-6 sm:p-8">

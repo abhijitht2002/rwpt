@@ -6,16 +6,16 @@ import { getEmployeeById } from "./admin.api";
 function Employee() {
   const { id } = useParams();
   const [employee, setEmployee] = useState(null)
+  const [stats, setStats] = useState(null)
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const fetchEmployee = async () => {
       try {
         const data = await getEmployeeById(id)
-        console.log("data: ", data.employee);
-        console.log("name: ", data.employee.name);
 
         setEmployee(data.employee)
+        setStats(data.stats)
       } catch (error) {
         console.error("Error fetching employee:", error);
       } finally {
@@ -59,17 +59,17 @@ function Employee() {
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 text-sm">
                 <div className="border border-gray-200 p-6">
                   <p className="text-gray-500">Total</p>
-                  <p className="mt-2 text-xl font-medium text-gray-900">24</p>
+                  <p className="mt-2 text-xl font-medium text-gray-900">{stats?.total}</p>
                 </div>
 
                 <div className="border border-gray-200 p-6">
                   <p className="text-gray-500">Completed</p>
-                  <p className="mt-2 text-xl font-medium text-gray-900">18</p>
+                  <p className="mt-2 text-xl font-medium text-gray-900">{stats?.completed}</p>
                 </div>
 
                 <div className="border border-gray-200 p-6">
                   <p className="text-gray-500">Pending</p>
-                  <p className="mt-2 text-xl font-medium text-gray-900">6</p>
+                  <p className="mt-2 text-xl font-medium text-gray-900">{stats?.pending}</p>
                 </div>
               </div>
             </div>
@@ -80,14 +80,14 @@ function Employee() {
 
               <div className="border border-gray-200 p-6 text-sm">
                 <p className="text-gray-500">Total</p>
-                <p className="mt-2 text-xl font-medium text-gray-900">3</p>
+                <p className="mt-2 text-xl font-medium text-gray-900">{stats?.managersWorkedWith}</p>
               </div>
             </div>
           </div>
 
-          <p className="text-sm text-gray-500 mt-6">
+          {/* <p className="text-sm text-gray-500 mt-6">
             Note: Upcoming tasks are excluded from these statistics.
-          </p>
+          </p> */}
         </section>
 
         {/* PROFILE */}
@@ -100,12 +100,6 @@ function Employee() {
             <div>
               <h2 className="text-2xl font-medium">{employee?.name}</h2>
               <p className="text-gray-500 mt-2">{employee?.email}</p>
-
-              <div className="mt-4 text-sm text-gray-600">
-                Role: {employee?.role} <br />
-                Assigned Manager: Manager Name <br />
-                Status: {employee?.status}
-              </div>
             </div>
           </div>
         </section>
@@ -126,19 +120,26 @@ function Employee() {
             </div>
 
             <div>
-              <p className="text-gray-500">Phone</p>
-              <p className="mt-1 font-medium">+91 XXXXX XXXXX</p>
+              <p className="text-gray-500">Role</p>
+              <p className="mt-1 font-medium">{employee?.role
+                ? employee.role.charAt(0).toUpperCase() + employee.role.slice(1).toLowerCase()
+                : "-"}</p>
             </div>
 
             <div>
-              <p className="text-gray-500">Department</p>
-              <p className="mt-1 font-medium">Coming soon</p>
+              <p className="text-gray-500">Joined on</p>
+              <p className="mt-1 font-medium">{new Date(employee.createdAt).toLocaleDateString("en-IN", {
+                year: "numeric",
+                month: "long",
+                day: "numeric",
+              })}</p>
             </div>
+
           </div>
         </section>
 
         {/* ACTIVITY */}
-        <section className="border border-gray-200 p-6 sm:p-8 mb-12">
+        {/* <section className="border border-gray-200 p-6 sm:p-8 mb-12">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-8">
             <h2 className="text-xl font-medium">Recent Activity</h2>
             <span className="text-sm text-gray-500">Last 7 days</span>
@@ -159,10 +160,10 @@ function Employee() {
               </div>
             ))}
           </div>
-        </section>
+        </section> */}
 
         {/* REPORTS */}
-        <section className="border border-gray-200 p-6 sm:p-8 mb-12">
+        {/* <section className="border border-gray-200 p-6 sm:p-8 mb-12">
           <div className="flex items-center justify-between mb-8">
             <h2 className="text-xl font-medium">Reports</h2>
           </div>
@@ -191,10 +192,10 @@ function Employee() {
               </div>
             ))}
           </div>
-        </section>
+        </section> */}
 
         {/* TIMELINE */}
-        <section className="border border-gray-200 p-6 sm:p-8 mb-12">
+        {/* <section className="border border-gray-200 p-6 sm:p-8 mb-12">
           <div className="flex items-center justify-between mb-8">
             <h2 className="text-lg sm:text-xl font-medium">Timeline</h2>
           </div>
@@ -217,7 +218,7 @@ function Employee() {
               </div>
             ))}
           </div>
-        </section>
+        </section> */}
 
         {/* danger */}
         <section className="mb-12 border border-red-200 bg-red-50 p-6 sm:p-8">

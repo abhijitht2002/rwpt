@@ -2,6 +2,7 @@ const bcrypt = require("bcrypt");
 const crypto = require("crypto");
 const User = require("../models/User");
 const { mailPassword } = require("../utils/sentMail");
+const Task = require("../models/Task");
 
 const createManager = async (req, res) => {
     const { name, email } = req.body
@@ -88,14 +89,53 @@ const getManagerById = async (req, res) => {
         const manager = await User.findById(req.params.id).select("-passwordHash")
         if (!manager) return res.status(404).json({ success: false, message: "Manager does not exist" });
 
+        // stas
+        const totalTask = await Task.countDocuments({ assigned_by: manager._id })
+        const completedTask = await Task.countDocuments({
+            assigned_by: manager._id,
+            status: "COMPLETED"
+        })
+        const pendingTask = await Task.countDocuments({
+            assigned_by: manager._id,
+            status: { $in: ["IN_PROGRESS", "UNTOUCHED"] }
+        })
+        const employeeIds = await Task.distinct("assigned_to", {
+            assigned_by: manager._id,
+        })
+
+        const employees = await User.find({
+            _id: { $in: employeeIds }
+        }).select("name email status role");
+
+        // working employees
+        const workingEmployeeIds = await Task.distinct("assigned_to", {
+            assigned_by: manager._id,
+            status: { $in: ["IN_PROGRESS"] }
+        });
+        const working = await User.countDocuments({
+            _id: { $in: workingEmployeeIds },
+            status: { $ne: "BLOCKED" }
+        })
+        // not-working employees
+        const notWorking = employees.length - working
+
         res.status(200).json({
             success: true,
-            manager
+            manager,
+            stats: {
+                totalTask,
+                completedTask,
+                pendingTask,
+                totalEmployees: employees.length,
+                working,
+                notWorking
+            },
+            employees
         });
 
     } catch (err) {
         console.log("Error fetching manager: ", err);
-        res.status(500).json({ message: "Server error" });
+        res.status(500).json({ success: false, message: "Server error" });
     }
 }
 
@@ -146,9 +186,29 @@ const getEmployeeById = async (req, res) => {
         const employee = await User.findById(req.params.id).select("-passwordHash")
         if (!employee) return res.status(404).json({ success: false, message: "Employee does not exist" });
 
+        // stats
+        const total = await Task.countDocuments({ assigned_to: employee._id });
+        const completed = await Task.countDocuments({
+            assigned_to: employee._id,
+            status: "COMPLETED",
+        });
+        const pending = await Task.countDocuments({
+            assigned_to: employee._id,
+            status: { $in: ["IN_PROGRESS", "UNTOUCHED"] },
+        });
+        const managersWorkedWith = await Task.distinct("assigned_by", {
+            assigned_to: employee._id,
+        });
+
         res.status(200).json({
             success: true,
-            employee
+            employee,
+            stats: {
+                total,
+                completed,
+                pending,
+                managersWorkedWith: managersWorkedWith.length
+            },
         });
     } catch (err) {
         console.log("Error fetching employee: ", err);
