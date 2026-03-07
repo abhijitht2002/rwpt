@@ -12,7 +12,7 @@ function Sidebar({ isOpen, setIsOpen }) {
 
   const linksByRole = {
     ADMIN: [
-      { name: "Summary", path: "/dashboard/summary" },
+      // { name: "Summary", path: "/dashboard/summary" },
       {
         name: "Users",
         children: [
@@ -26,7 +26,7 @@ function Sidebar({ isOpen, setIsOpen }) {
       },
     ],
     MANAGER: [
-      { name: "Summary", path: "/dashboard/summary" },
+      // { name: "Summary", path: "/dashboard/summary" },
       {
         name: "Tasks",
         children: [
@@ -41,7 +41,7 @@ function Sidebar({ isOpen, setIsOpen }) {
       },
     ],
     EMPLOYEE: [
-      { name: "Summary", path: "/dashboard/summary" },
+      // { name: "Summary", path: "/dashboard/summary" },
       {
         name: "Tasks",
         children: [

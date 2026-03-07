@@ -37,7 +37,7 @@ function App() {
       </Route>
 
       <Route path="/dashboard" element={<Dashboard />}>
-        <Route path="summary" element={<Summary />} />
+        <Route index element={<Summary />} />
         <Route path="managers" element={<Managers />} />
         <Route path="managers/:id" element={<Manager />} />
         <Route path="employees" element={<Employees />} />
