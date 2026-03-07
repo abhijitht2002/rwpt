@@ -18,6 +18,7 @@ import Employee from "./pages/admin/Employee";
 import TasksPage from "./pages/task/TasksPage";
 import Reset from "./pages/account/Reset";
 import Forgot from "./pages/account/Forgot";
+import Task from "./pages/task/Task";
 
 function App() {
   return (
@@ -31,7 +32,7 @@ function App() {
         <Route path="register" element={<CreateAccount />} />
         <Route path="login" element={<Login />} />
         <Route path="register-success" element={<Success />} />
-        
+
         <Route path="forgot-password" element={<Forgot />} />
       </Route>
 
@@ -43,6 +44,8 @@ function App() {
         <Route path="employees/:id" element={<Employee />} />
 
         <Route path="tasks/:filter" element={<TasksPage />} />
+
+        <Route path="task/:id" element={<Task />} />
 
         <Route path="notes" element={<Notes />} />
 

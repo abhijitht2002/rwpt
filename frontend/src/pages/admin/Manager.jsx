@@ -1,6 +1,6 @@
 import React from "react";
 import { useState, useEffect } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { getManagerById } from "./admin.api";
 
 function Manager() {
@@ -9,6 +9,7 @@ function Manager() {
   const [stats, setStats] = useState(null)
   const [employees, setEmployees] = useState([])
   const [loading, setLoading] = useState(true)
+  const navigate = useNavigate()
 
   useEffect(() => {
     const fetchManager = async () => {
@@ -43,7 +44,9 @@ function Manager() {
           </p>
         </div>
 
-        <button className="w-full sm:w-auto px-6 py-2 border border-black text-black hover:bg-black hover:text-white transition text-sm">
+        <button className="w-full sm:w-auto px-6 py-2 border border-black text-black hover:bg-black hover:text-white transition text-sm"
+          onClick={() => { document.getElementById("edit")?.scrollIntoView({ behavior: "smooth" }) }}
+        >
           Edit Manager
         </button>
       </div>
@@ -110,7 +113,7 @@ function Manager() {
         <div className="flex flex-col sm:flex-row sm:items-start gap-6">
           {/* Avatar */}
           <div className="w-16 h-16 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-xl font-medium text-gray-700 shrink-0">
-            {manager?.name.charAt(0).toUpperCase()}
+            {manager?.name?.charAt(0).toUpperCase()}
           </div>
 
           {/* Basic Info */}
@@ -154,6 +157,50 @@ function Manager() {
             })}</p>
           </div>
         </div>
+      </section>
+
+      {/* CHANGE NAME */}
+      <section id="edit" className="border border-gray-200 p-6 sm:p-8 mb-12">
+        <h2 className="text-lg sm:text-xl font-medium mb-6">
+          Change Name
+        </h2>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+          <div>
+            <label className="text-gray-500">Full Name</label>
+            <input
+              type="text"
+              defaultValue={manager?.name}
+              className="mt-2 w-full border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:border-black"
+            />
+          </div>
+        </div>
+
+        <button className="mt-4 px-5 py-2 text-sm border border-black hover:bg-black hover:text-white transition">
+          Save Changes
+        </button>
+      </section>
+
+      {/* CHANGE EMAIL */}
+      <section className="border border-gray-200 p-6 sm:p-8 mb-12">
+        <h2 className="text-lg sm:text-xl font-medium mb-6">
+          Change Email
+        </h2>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+          <div>
+            <label className="text-gray-500">Email</label>
+            <input
+              type="email"
+              defaultValue={manager?.email}
+              className="mt-2 w-full border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:border-black"
+            />
+          </div>
+        </div>
+
+        <button className="mt-4 px-5 py-2 text-sm border border-black hover:bg-black hover:text-white transition">
+          Save Changes
+        </button>
       </section>
 
       {/* TEAM MEMBERS */}
