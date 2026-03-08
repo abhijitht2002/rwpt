@@ -1,5 +1,6 @@
 const axios = require("axios");
 const dotenv = require("dotenv");
+const env = require("../config/env");
 dotenv.config()
 
 const mailOTP = () => { }
@@ -10,7 +11,7 @@ const mailPassword = async (name, email, password) => {
             {
                 sender: {
                     name: "RWPT account action",
-                    email: process.env.EMAIL_SENDER
+                    email: env.EMAIL_SENDER
                 },
                 to: [
                     {
@@ -29,7 +30,7 @@ const mailPassword = async (name, email, password) => {
             },
             {
                 headers: {
-                    "api-key": process.env.BREVO_API_KEY,
+                    "api-key": env.BREVO_API_KEY,
                     "Content-Type": "application/json",
                 },
             }

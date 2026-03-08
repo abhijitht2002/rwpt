@@ -17,7 +17,8 @@ const register = async (req, res) => {
       email,
       passwordHash: hashPass,
       role: "EMPLOYEE",
-      status: "ACTIVE"
+      status: "ACTIVE",
+      provider: "LOCAL"
     });
 
     await newUser.save();
@@ -120,28 +121,4 @@ const getMe = async (req, res) => {
   }
 };
 
-const getProfile = async (req, res) => {
-  try {
-    const user = await User.findById(req.user.id).select("-password");
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: "User not found"
-      });
-    }
-
-    res.json({
-      success: true,
-      user
-    });
-  } catch (err) {
-    console.log(err);
-
-    res.status(500).json({
-      success: false,
-      message: "Server error"
-    });
-  }
-}
-
-module.exports = { register, login, refresh, logout, getMe, getProfile };
+module.exports = { register, login, refresh, logout, getMe };

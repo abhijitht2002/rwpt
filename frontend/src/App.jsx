@@ -19,6 +19,8 @@ import TasksPage from "./pages/task/TasksPage";
 import Reset from "./pages/account/Reset";
 import Forgot from "./pages/account/Forgot";
 import Task from "./pages/task/Task";
+import OAuthSuccess from "./pages/oauth/OAuthSuccess ";
+import OAuthFailure from "./pages/oauth/OAuthFailure";
 
 function App() {
   return (
@@ -32,6 +34,9 @@ function App() {
         <Route path="register" element={<CreateAccount />} />
         <Route path="login" element={<Login />} />
         <Route path="register-success" element={<Success />} />
+
+        <Route path="oauth-failure" element={<OAuthFailure />} />
+        <Route path="oauth-success" element={<OAuthSuccess />} />
 
         <Route path="forgot-password" element={<Forgot />} />
       </Route>

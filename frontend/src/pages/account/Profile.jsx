@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { getProfileAPI } from "../../services/auth.service";
+import { changeAvatarAPI, getProfileAPI } from "../../services/profile.service";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import axios from "axios";
+import toast from "react-hot-toast";
 
 function Profile() {
   const { logout } = useAuth()
@@ -9,34 +11,61 @@ function Profile() {
   const [loading, setLoading] = useState(false)
   const navigate = useNavigate()
 
-  useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        setLoading(true)
-
-        const data = await getProfileAPI()
-        console.log(data)
-
-        setUser(data.user)
-      } catch (error) {
-        console.error("Failed to fetch profile:", error)
-      } finally {
-        setLoading(false)
-      }
+  const fetchProfile = async () => {
+    try {
+      setLoading(true)
+      const data = await getProfileAPI()
+      setUser(data.user)
+    } catch (error) {
+      console.error("Failed to fetch profile:", error)
+    } finally {
+      setLoading(false)
     }
+  }
 
+  useEffect(() => {
     fetchProfile()
   }, [])
 
-  const handleAvatarChange = (e) => {
+  const handleAvatarChange = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
     console.log("Avatar file:", file);
+
+    const formData = new FormData()
+    formData.append("file", file)
+    formData.append("upload_preset", "avatars_unsigned"); // Replace with your Cloudinary preset
+
+    try {
+      await toast.promise(
+        createManager(form),
+        {
+          loading: "Creating manager...",
+          success: (res) => {
+            fetchManagers();
+            setForm({ name: "", email: "" });
+            return res.message || "Manager created successfully";
+          },
+          error: (err) =>
+            err.response?.data?.message || "Failed to create manager",
+        }
+      )
+
+      const res = await axios.post(
+        "https://api.cloudinary.com/v1_1/dylgmtxuz/image/upload", // https://api.cloudinary.com/v1_1/YOUR_CLOUD_NAME/image/upload
+        formData
+      );
+      await changeAvatarAPI(res.data.secure_url);
+    } catch (err) {
+      console.error("Upload error:", err);
+    }
   };
 
   const handleResetPassword = async (e) => {
     e.preventDefault()
+
+    if (user.provider === "GOOGLE") return
 
     navigate("/dashboard/account/reset-password")
   }
@@ -65,8 +94,16 @@ function Profile() {
           <section className="border border-gray-200 p-6 sm:p-8 mb-12">
             <div className="flex flex-col sm:flex-row items-start gap-6">
               <div className="relative">
-                <div className="w-16 h-16 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-xl font-medium text-gray-700">
-                  {user?.name?.charAt(0)?.toUpperCase()}
+                <div className="w-16 h-16 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-xl font-medium text-gray-700 overflow-hidden">
+                  {user?.avatar ? (
+                    <img
+                      src={user.avatar}
+                      alt={user?.name}
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <span>{user?.name?.charAt(0)?.toUpperCase()}</span>
+                  )}
                 </div>
 
                 <label className="absolute -bottom-2 -right-2 bg-white border border-gray-300 text-xs px-2 py-1 cursor-pointer hover:bg-gray-100 transition">
@@ -130,7 +167,7 @@ function Profile() {
           </section>
 
           {/* SECURITY */}
-          <section className="border border-gray-200 p-6 sm:p-8 mb-12">
+          {user?.provider === "LOCAL" && <section className="border border-gray-200 p-6 sm:p-8 mb-12">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-medium">Security</h2>
             </div>
@@ -147,7 +184,8 @@ function Profile() {
                 Reset Password
               </button>
             </div>
-          </section>
+          </section>}
+
 
           {/* DANGER ZONE */}
           {user?.role === "EMPLOYEE" && (
@@ -173,11 +211,12 @@ function Profile() {
               </div>
             </section>
           )}
-        </>)}
+        </>)
+        }
 
 
-      </div>
-    </div>
+      </div >
+    </div >
   );
 }
 

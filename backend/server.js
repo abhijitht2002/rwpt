@@ -5,18 +5,20 @@ const cookieParser = require("cookie-parser");
 const env = require("./config/env");
 const connectDB = require("./config/db");
 const authRoutes = require("./routes/auth.routes");
+const oauthRoutes = require("./routes/oauth.routes")
 const adminRoutes = require("./routes/admin.routes");
 const tasksRoutes = require("./routes/tasks.routes");
 const managerRoutes = require("./routes/manager.routes")
-
-app.use(express.json());
-
-app.use(cookieParser());
+const profileRoutes = require("./routes/profile.router")
+const passport = require('./config/passport');
 
 app.use(cors({
-  origin: "http://localhost:5173",
+  origin: env.CLIENT_URL,
   credentials: true,
 }));
+app.use(express.json());
+app.use(cookieParser());
+app.use(passport.initialize())
 
 connectDB();
 
@@ -25,6 +27,8 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/auth", authRoutes);
+app.use("/api/auth", oauthRoutes);
+app.use("/api/profile", profileRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/tasks", tasksRoutes);
 app.use("/api/manager", managerRoutes);

@@ -19,11 +19,6 @@ export const getMeAPI = async () => {
     return res.data;
 };
 
-export const getProfileAPI = async () => {
-    const res = await API.get("/auth/profile");
-    return res.data;
-};
-
 export const resetAPI = async () => { };
 
 export const forgotAPI = async () => { };

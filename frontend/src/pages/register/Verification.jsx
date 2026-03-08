@@ -2,6 +2,7 @@ import React from "react";
 import { useEffect } from "react";
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+const API_URL = import.meta.env.VITE_API_URL;
 
 function Verification() {
   const location = useLocation();
@@ -53,6 +54,10 @@ function Verification() {
     }
   };
 
+  const handleGoogleLogin = () => {
+    window.location.href = `${API_URL}/auth/google`;
+  }
+
   return (
     <>
       {/* Heading */}
@@ -71,6 +76,7 @@ function Verification() {
           <button
             type="button"
             className="w-full flex items-center justify-center gap-3 border py-3 text-sm font-medium transition hover:bg-black hover:text-white hover:cursor-pointer"
+            onClick={handleGoogleLogin}
           >
             <img
               src="https://www.svgrepo.com/show/475656/google-color.svg"

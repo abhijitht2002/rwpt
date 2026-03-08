@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useState } from "react";
 import toast from "react-hot-toast";
+const API_URL = import.meta.env.VITE_API_URL;
 
 function Login() {
   const { login, loading } = useAuth();
@@ -26,6 +27,10 @@ function Login() {
     }
   };
 
+  const handleGoogleLogin = () => {
+    window.location.href = `${API_URL}/auth/google`;
+  }
+
   return (
     <>
       {/* Heading */}
@@ -43,6 +48,7 @@ function Login() {
         <button
           type="button"
           className="w-full flex items-center justify-center gap-3 border py-3 text-sm font-medium transition hover:bg-black hover:text-white hover:cursor-pointer"
+          onClick={handleGoogleLogin}
         >
           <img
             src="https://www.svgrepo.com/show/475656/google-color.svg"
