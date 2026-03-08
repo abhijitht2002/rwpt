@@ -35,28 +35,28 @@ function Profile() {
 
     const formData = new FormData()
     formData.append("file", file)
-    formData.append("upload_preset", "avatars_unsigned"); // Replace with your Cloudinary preset
+    formData.append("upload_preset", "avatars_unsigned");
 
     try {
       await toast.promise(
-        createManager(form),
+        (async () => {
+          const res = await axios.post(
+            "https://api.cloudinary.com/v1_1/dylgmtxuz/image/upload", // https://api.cloudinary.com/v1_1/YOUR_CLOUD_NAME/image/upload
+            formData
+          );
+          const result = await changeAvatarAPI(res.data.secure_url);
+          return result
+        })(),
         {
-          loading: "Creating manager...",
+          loading: "Uploading image...",
           success: (res) => {
-            fetchManagers();
-            setForm({ name: "", email: "" });
-            return res.message || "Manager created successfully";
+            fetchProfile()
+            return res.message || "Avatar changed successfully";
           },
           error: (err) =>
-            err.response?.data?.message || "Failed to create manager",
+            err.response?.data?.message || "Failed Avatar change",
         }
       )
-
-      const res = await axios.post(
-        "https://api.cloudinary.com/v1_1/dylgmtxuz/image/upload", // https://api.cloudinary.com/v1_1/YOUR_CLOUD_NAME/image/upload
-        formData
-      );
-      await changeAvatarAPI(res.data.secure_url);
     } catch (err) {
       console.error("Upload error:", err);
     }

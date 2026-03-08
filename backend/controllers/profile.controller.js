@@ -25,8 +25,16 @@ const getProfile = async (req, res) => {
 }
 
 const changeAvatar = async (req, res) => {
-    const { image } = req.body
     try {
+        const { avatar } = req.body
+
+        if (!avatar) {
+            return res.status(400).json({
+                success: false,
+                message: "Avatar URL is required"
+            });
+        }
+
         const user = await User.findById(req.user.id).select("-passwordHash");
         if (!user) {
             return res.status(404).json({
@@ -35,13 +43,13 @@ const changeAvatar = async (req, res) => {
             });
         }
 
-        user.avatar = image
+        user.avatar = avatar
         await user.save()
 
         res.json({
             success: true,
             message: "Avatar changed successfully",
-            avatar: image
+            avatar: avatar
         });
     } catch (err) {
         console.log(err);
