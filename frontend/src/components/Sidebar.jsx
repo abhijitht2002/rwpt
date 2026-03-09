@@ -46,7 +46,7 @@ function Sidebar({ isOpen, setIsOpen }) {
         name: "Tasks",
         children: [
           { name: "Upcoming", path: "/dashboard/tasks/upcoming" },
-          { name: "Due", path: "/dashboard/tasks/due" },
+          { name: "Pending", path: "/dashboard/tasks/pending" },
           { name: "Completed", path: "/dashboard/tasks/completed" },
         ],
       },

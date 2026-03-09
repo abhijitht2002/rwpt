@@ -170,8 +170,16 @@ function Managers() {
                     {/* Left Side */}
                     <div className="flex items-start sm:items-center gap-4">
                       {/* Avatar */}
-                      <div className="w-10 h-10 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-sm font-medium text-gray-700 shrink-0">
-                        {manager.name?.charAt(0)?.toUpperCase() || "M"}
+                      <div className="w-10 h-10 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-sm font-medium text-gray-700 overflow-hidden">
+                        {manager?.avatar ? (
+                          <img
+                            src={manager.avatar}
+                            alt={manager?.name}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <span>{manager?.name?.charAt(0)?.toUpperCase()}</span>
+                        )}
                       </div>
 
                       {/* Text Info */}

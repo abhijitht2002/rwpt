@@ -95,8 +95,17 @@ function Employee() {
         {/* PROFILE */}
         <section className="border border-gray-200 p-6 sm:p-8 mb-12">
           <div className="flex flex-col sm:flex-row items-start gap-6">
-            <div className="w-16 h-16 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-xl font-medium text-gray-700 shrink-0">
-              E
+            {/* Avatar */}
+            <div className="w-16 h-16 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-xl font-medium text-gray-700 overflow-hidden">
+              {employee?.avatar ? (
+                <img
+                  src={employee.avatar}
+                  alt={employee?.name}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <span>{employee?.name?.charAt(0)?.toUpperCase()}</span>
+              )}
             </div>
 
             <div>

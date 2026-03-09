@@ -1,26 +1,162 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useAuth } from "../../context/AuthContext";
-import { useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { endTaskAPI, getTaskByIdAPI, startTaskAPI } from "../../services/task.service";
+import toast from "react-hot-toast";
 
 function Task() {
+    const { id } = useParams()
     const { user } = useAuth();
+    const [task, setTask] = useState(null)
+    const [assignee, setAssignee] = useState(null)
+    const [loading, setLoading] = useState(true)
+    const [timer, setTimer] = useState(0)
+    const [isRunning, setIsRunning] = useState(false)
+    const [showStopModal, setShowStopModal] = useState(false)
+    const [comment, setComment] = useState("")
+    const [logs, setLogs] = useState([])
+    const [error, setError] = useState("")
+    const navigate = useNavigate()
 
-    // const isManager = user?.role === "MANAGER";
+    const isManager = user?.role === "MANAGER";
 
-    const isManager = true;
+    const fetchTask = async () => {
+        try {
+            const data = await getTaskByIdAPI(id)
+            console.log(data);
 
-    const [task, setTask] = useState({
-        title: "Fix login bug",
-        description:
-            "Users cannot login when password contains special characters. Investigate backend validation and update the auth middleware.",
-        status: "PENDING", // PENDING | IN_PROGRESS | COMPLETED
-        assignedTo: {
-            name: "Arjun Nair",
-            email: "arjun@example.com"
-        },
-        createdAt: "2026-03-07",
-        dueDate: "2026-03-08"
-    });
+            setTask(data.task)
+            setAssignee(data.assignee)
+            setLogs(data.logs)
+        } catch (error) {
+            console.error("Failed to fetch task:", error)
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    useEffect(() => {
+        fetchTask()
+    }, [])
+
+    useEffect(() => {
+        let interval
+
+        if (isRunning) {
+            interval = setInterval(() => {
+                setTimer(prev => prev + 1)
+            }, 1000)
+        }
+
+        return () => clearInterval(interval)
+    }, [isRunning])
+
+    const formatTime = (seconds) => {
+        const hrs = Math.floor(seconds / 3600)
+        const mins = Math.floor((seconds % 3600) / 60)
+        const secs = seconds % 60
+
+        return `${hrs.toString().padStart(2, "0")}:${mins
+            .toString()
+            .padStart(2, "0")}:${secs.toString().padStart(2, "0")}`
+    }
+
+    const now = new Date();
+    const due = new Date(task?.due_date);
+    const diff = due - now;
+    const hoursLeft = diff / (1000 * 60 * 60);
+
+    let deadlineStatus = "NORMAL";
+    if (diff < 0) {
+        deadlineStatus = "OVERDUE";
+    } else if (hoursLeft < 24) {
+        deadlineStatus = "DUE_SOON";
+    }
+
+    const startTask = async (id) => {
+        if (isManager || isRunning) return
+
+        try {
+            await toast.promise(
+                startTaskAPI(id),
+                {
+                    loading: "Starting task...",
+                    success: (res) => {
+                        setIsRunning(true)
+                        return res.message || "Task started successfully"
+                    },
+                    error: (err) => err.response?.data?.message || "Failed operation",
+                }
+            )
+
+            fetchTasks()
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    const stopTask = () => {
+        setIsRunning(false)
+        setShowStopModal(true)
+    }
+
+    const resumeTask = () => {
+        setIsRunning(true)
+        setShowStopModal(false)
+    }
+
+    const validateComment = () => {
+        if (!comment.trim()) {
+            setError("Comment is required")
+            return false
+        }
+        setError("")
+        return true
+    }
+
+    const endTodayWork = async (id) => {
+        if (!validateComment()) return
+
+        try {
+            await toast.promise(
+                endTaskAPI(id, "d", comment),
+                {
+                    loading: "Ending task...",
+                    success: (res) => res.message || "Task ended successfully",
+                    error: (err) => err.response?.data?.message || "Failed operation",
+                }
+            )
+
+            setShowStopModal(false)
+            setComment("")
+            setTimer(0)
+            fetchTask()
+        } catch (err) {
+            console.error("error:", err);
+        }
+    }
+
+    const completeTask = async (id) => {
+        if (!validateComment()) return
+
+        try {
+            await toast.promise(
+                await endTaskAPI(id, "e", comment),
+                {
+                    loading: "Ending task...",
+                    success: (res) => res.message || "Task ended successfully",
+                    error: (err) => err.response?.data?.message || "Failed operation",
+                }
+            )
+
+            setShowStopModal(false)
+            setComment("")
+            setTimer(0)
+            fetchTask()
+        } catch (err) {
+            console.error("error:", err)
+        }
+    }
 
     const [timeline] = useState([
         {
@@ -46,99 +182,6 @@ function Task() {
         }
     ]);
 
-    const [timer, setTimer] = useState(0)
-    const [isRunning, setIsRunning] = useState(false)
-    const [showStopModal, setShowStopModal] = useState(false)
-    const [comment, setComment] = useState("")
-    const [error, setError] = useState("")
-
-    useEffect(() => {
-        let interval
-
-        if (isRunning) {
-            interval = setInterval(() => {
-                setTimer(prev => prev + 1)
-            }, 1000)
-        }
-
-        return () => clearInterval(interval)
-    }, [isRunning])
-
-    const formatTime = (seconds) => {
-        const hrs = Math.floor(seconds / 3600)
-        const mins = Math.floor((seconds % 3600) / 60)
-        const secs = seconds % 60
-
-        return `${hrs.toString().padStart(2, "0")}:${mins
-            .toString()
-            .padStart(2, "0")}:${secs.toString().padStart(2, "0")}`
-    }
-
-    const now = new Date();
-    const due = new Date(task.dueDate);
-
-    const diff = due - now;
-
-    const hoursLeft = diff / (1000 * 60 * 60);
-
-    let deadlineStatus = "NORMAL";
-
-    if (diff < 0) {
-        deadlineStatus = "OVERDUE";
-    } else if (hoursLeft < 24) {
-        deadlineStatus = "DUE_SOON";
-    }
-
-    const startTask = () => {
-        setIsRunning(true)
-        setTask((prev) => ({
-            ...prev,
-            status: "IN_PROGRESS"
-        }));
-    }
-
-    const stopTask = () => {
-        setIsRunning(false)
-        setShowStopModal(true)
-        setTask((prev) => ({
-            ...prev,
-            status: "COMPLETED"
-        }));
-    }
-
-    const resumeTask = () => {
-        setIsRunning(true)
-        setShowStopModal(false)
-    }
-
-    const endTodayWork = () => {
-        if (!validateComment()) return
-
-        // API call example
-        console.log("End today work with comment:", comment)
-
-        setShowStopModal(false)
-        setComment("")
-    }
-
-    const completeTask = () => {
-        if (!validateComment()) return
-
-        console.log("Complete task with comment:", comment)
-
-        setShowStopModal(false)
-        setComment("")
-    }
-
-    const validateComment = () => {
-        if (!comment.trim()) {
-            setError("Comment is required")
-            return false
-        }
-        setError("")
-        return true
-    }
-
     return (
         <div className="max-w-3xl mx-auto">
 
@@ -146,85 +189,85 @@ function Task() {
             <section className="border border-gray-200 p-6 mb-8">
                 <div className="flex flex-wrap items-center gap-3">
                     <h1 className="text-2xl font-semibold text-gray-900">
-                        {task.title}
+                        {task?.title}
                     </h1>
 
-                    {task.status === "UNTOUCHED" && (
+                    {task?.status === "UNTOUCHED" && (
                         <span className="text-xs px-2 py-1 border border-yellow-400 text-yellow-700">
                             NEW
                         </span>
                     )}
+
+                    <span
+                        className={`px-2 py-1 text-xs font-medium border 
+                                ${task?.status === "UNTOUCHED"
+                                ? "border-gray-300 text-gray-600"
+                                : task?.status === "IN_PROGRESS"
+                                    ? "border-blue-400 text-blue-600"
+                                    : "border-green-400 text-green-600"
+                            }`}
+                    >
+                        {task?.status}
+                    </span>
                 </div>
 
                 <p className="mt-4 text-gray-600 text-sm leading-relaxed">
-                    {task.description}
+                    {task?.description}
                 </p>
 
                 <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
                     <div>
-                        <p className="text-gray-500">Status</p>
-                        <p className="font-medium mt-1"><span
-                            className={`px-2 py-1 text-xs font-medium border 
-                                ${task.status === "UNTOUCHED"
-                                    ? "border-gray-300 text-gray-600"
-                                    : task.status === "IN_PROGRESS"
-                                        ? "border-blue-400 text-blue-600"
-                                        : "border-green-400 text-green-600"
-                                }`}
-                        >
-                            {task.status}
-                        </span></p>
-                    </div>
-
-                    <div>
-                        <p className="text-gray-500">Created</p>
+                        <p className="text-gray-500">Start Date</p>
                         <p className="font-medium mt-1">
-                            {new Date(task.createdAt).toLocaleDateString()}
+                            {/* {new Date(task?.createdAt).toLocaleDateString()} */}
+                            {new Date(task?.start_date).toLocaleDateString()}
                         </p>
                     </div>
 
                     <div>
-                        <p className="text-gray-500">Due</p>
+                        <p className="text-gray-500">Due Date</p>
                         <p className="font-medium mt-1">
-                            {new Date(task.dueDate).toLocaleDateString()}
+                            {new Date(task?.due_date).toLocaleDateString()}
                         </p>
 
-                        {task.status !== "COMPLETED" && deadlineStatus === "DUE_SOON" && (
+                        {task?.status !== "COMPLETED" && deadlineStatus === "DUE_SOON" && (
                             <p className="text-orange-600 text-xs mt-1">
                                 ⚠ Due within 24 hours
                             </p>
                         )}
 
-                        {task.status !== "COMPLETED" && deadlineStatus === "OVERDUE" && (
+                        {task?.status !== "COMPLETED" && deadlineStatus === "OVERDUE" && (
                             <p className="text-red-600 text-xs mt-1">
                                 Task overdue
                             </p>
                         )}
                     </div>
                 </div>
+
+                <p className="mt-8 text-xs text-gray-400">
+                    Created on {new Date(task?.createdAt).toLocaleDateString()}
+                </p>
             </section>
 
 
-            {/* ASSIGNED EMPLOYEE (Manager only) */}
-            {isManager && (
-                <section className="border border-gray-200 p-6 mb-8">
-                    <h2 className="text-lg font-medium mb-4">
-                        Assigned Employee
-                    </h2>
+            {/* ASSIGNEE */}
+            <section className="border border-gray-200 p-6 mb-8">
+                <h2 className="text-lg font-medium mb-4">
+                    Assigned {isManager ? "Employee" : "Manager"}
+                </h2>
 
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                        <div>
-                            <p className="font-medium">{task.assignedTo.name}</p>
-                        </div>
-
-                        <div className="text-sm text-gray-500">
-                            <p className="text-sm text-gray-500">
-                                {task.assignedTo.email}
-                            </p>
-                        </div>
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                    <div>
+                        <p className="font-medium">{assignee?.name}</p>
                     </div>
-                </section>
-            )}
+
+                    <div className="text-sm text-gray-500">
+                        <p className="text-sm text-gray-500">
+                            {assignee?.email}
+                        </p>
+                    </div>
+                </div>
+            </section>
 
             {/* EMPLOYEE ACTIONS */}
             {!isManager && (
@@ -240,12 +283,17 @@ function Task() {
                     )}
 
                     <div className="flex flex-col sm:flex-row gap-3">
-
                         <button
-                            onClick={startTask}
-                            disabled={task.status !== "PENDING" || isRunning}
+                            onClick={() => startTask(task?._id)}
+                            disabled={
+                                new Date(task?.start_date) >= new Date() ||
+                                task?.status === "COMPLETED" ||
+                                isRunning
+                            }
                             className={`px-5 py-2 border text-sm transition 
-                                ${task.status === "PENDING" && !isRunning
+                                ${new Date(task?.start_date) < new Date() &&
+                                    task?.status !== "COMPLETED" &&
+                                    !isRunning
                                     ? "border-black hover:bg-black hover:text-white"
                                     : "border-gray-200 text-gray-400 cursor-not-allowed"
                                 }`}
@@ -268,29 +316,35 @@ function Task() {
                 </section>
             )}
 
-            {/* TIMELINE */}
+            {/* LOGS */}
             <section className="border border-gray-200 p-6 mt-8">
                 <h2 className="text-lg font-medium mb-6">
-                    Activity Tracker
+                    Activity Logs
                 </h2>
 
                 <div className="flex flex-col text-sm">
-                    {timeline.map((item, index) => (
-                        <div key={item.id} className="flex flex-col">
+                    {logs.map((item, index) => (
+                        <div key={item._id} className="flex flex-col">
 
                             <div className="pb-6">
 
                                 <h3 className="text-sm font-medium text-gray-900">
-                                    {item.message}
+                                    {item.comment || "Work session recorded"}
                                 </h3>
 
                                 <p className="text-xs text-gray-400 mt-1">
-                                    {item.user} • {new Date(item.createdAt).toLocaleString()}
+                                    {new Date(item.start).toLocaleString()}
+
+                                    {item.duration && (
+                                        <span className="ml-2">
+                                            • {Math.floor(item.duration / 60)} min
+                                        </span>
+                                    )}
                                 </p>
 
                             </div>
 
-                            {index !== timeline.length - 1 && (
+                            {index !== logs.length - 1 && (
                                 <div className="h-6 border-l border-gray-200 ml-1" />
                             )}
 
@@ -336,14 +390,14 @@ function Task() {
                         <div className="flex flex-col sm:flex-row gap-3">
 
                             <button
-                                onClick={endTodayWork}
+                                onClick={() => endTodayWork(task?._id)}
                                 className="flex-1 border px-4 py-2 text-sm hover:bg-gray-100"
                             >
                                 End Today's Work
                             </button>
 
                             <button
-                                onClick={completeTask}
+                                onClick={() => completeTask(task?._id)}
                                 className="flex-1 border border-green-500 text-green-600 px-4 py-2 text-sm hover:bg-green-50"
                             >
                                 Complete Task

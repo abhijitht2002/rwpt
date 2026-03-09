@@ -112,8 +112,16 @@ function Manager() {
       <section className="border border-gray-200 p-6 sm:p-8 mb-12">
         <div className="flex flex-col sm:flex-row sm:items-start gap-6">
           {/* Avatar */}
-          <div className="w-16 h-16 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-xl font-medium text-gray-700 shrink-0">
-            {manager?.name?.charAt(0).toUpperCase()}
+          <div className="w-16 h-16 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-xl font-medium text-gray-700 overflow-hidden">
+            {manager?.avatar ? (
+              <img
+                src={manager.avatar}
+                alt={manager?.name}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <span>{manager?.name?.charAt(0)?.toUpperCase()}</span>
+            )}
           </div>
 
           {/* Basic Info */}

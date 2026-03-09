@@ -65,8 +65,16 @@ function Employees() {
                   {/* Left Side */}
                   <div className="flex items-start sm:items-center gap-4">
                     {/* Avatar */}
-                    <div className="w-10 h-10 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-sm font-medium text-gray-700 shrink-0">
-                      {employee.name?.charAt(0)?.toUpperCase() || "M"}
+                    <div className="w-10 h-10 rounded-full bg-gray-100 border border-gray-200 flex items-center justify-center text-sm font-medium text-gray-700 overflow-hidden">
+                      {employee?.avatar ? (
+                        <img
+                          src={employee.avatar}
+                          alt={employee?.name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <span>{employee?.name?.charAt(0)?.toUpperCase()}</span>
+                      )}
                     </div>
 
                     {/* Text Info */}
