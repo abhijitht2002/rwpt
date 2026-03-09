@@ -105,7 +105,7 @@ const getManagerById = async (req, res) => {
 
         const employees = await User.find({
             _id: { $in: employeeIds }
-        }).select("name email status role");
+        }).select("avatar name email status role");
 
         // working employees
         const workingEmployeeIds = await Task.distinct("assigned_to", {
