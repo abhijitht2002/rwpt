@@ -103,6 +103,7 @@ function Task() {
     const resumeTask = () => {
         setIsRunning(true)
         setShowStopModal(false)
+        setComment("")
     }
 
     const validateComment = () => {
@@ -141,7 +142,7 @@ function Task() {
 
         try {
             await toast.promise(
-                await endTaskAPI(id, "e", comment),
+                endTaskAPI(id, "e", comment),
                 {
                     loading: "Ending task...",
                     success: (res) => res.message || "Task ended successfully",
@@ -158,29 +159,16 @@ function Task() {
         }
     }
 
-    const [timeline] = useState([
-        {
-            id: 1,
-            type: "COMMENT",
-            message: "Investigating authentication middleware.",
-            user: "Arjun Nair",
-            createdAt: "2026-03-07T09:30:00"
-        },
-        {
-            id: 2,
-            type: "STARTED",
-            message: "Started working on the task.",
-            user: "Arjun Nair",
-            createdAt: "2026-03-07T09:00:00"
-        },
-        {
-            id: 3,
-            type: "CREATED",
-            message: "Task created by manager.",
-            user: "Manager",
-            createdAt: "2026-03-06T18:20:00"
-        }
-    ]);
+    const formatLogTime = (t) =>
+        new Date(t).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
+
+    const formatDuration = (sec) => {
+        const hrs = Math.floor(sec / 3600)
+        const mins = Math.floor((sec % 3600) / 60)
+
+        if (hrs > 0) return `${hrs} hr ${mins ? mins + " min" : ""}`
+        return `${mins} min`
+    }
 
     return (
         <div className="max-w-3xl mx-auto">
@@ -323,6 +311,9 @@ function Task() {
                 </h2>
 
                 <div className="flex flex-col text-sm">
+                    {logs.length === 0 && (<p className="text-sm font-medium text-gray-400">
+                        No logs yet.
+                    </p>)}
                     {logs.map((item, index) => (
                         <div key={item._id} className="flex flex-col">
 
@@ -332,12 +323,19 @@ function Task() {
                                     {item.comment || "Work session recorded"}
                                 </h3>
 
+                                <p className={`text-xs mt-1 
+                                ${item?.status === "IN_PROGRESS"
+                                        ? "border-blue-400 text-blue-600"
+                                        : "border-green-400 text-green-600"
+                                    }`}>{item.status}</p>
+
                                 <p className="text-xs text-gray-400 mt-1">
-                                    {new Date(item.start).toLocaleString()}
+                                    {formatLogTime(item.start)}
+                                    {item.end && ` → ${formatLogTime(item.end)}`}
 
                                     {item.duration && (
                                         <span className="ml-2">
-                                            • {Math.floor(item.duration / 60)} min
+                                            • {formatDuration(item.duration)}
                                         </span>
                                     )}
                                 </p>
@@ -351,7 +349,7 @@ function Task() {
                         </div>
                     ))}
                 </div>
-            </section>
+            </section >
 
             {showStopModal && (
                 <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
@@ -414,8 +412,9 @@ function Task() {
 
                     </div>
                 </div>
-            )}
-        </div>
+            )
+            }
+        </div >
     );
 }
 

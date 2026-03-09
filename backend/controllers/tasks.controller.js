@@ -97,7 +97,7 @@ const getTaskById = async (req, res) => {
         const logs = await Timelog.find({
             task: task._id,
             end: { $ne: null }
-        })
+        }).sort({ end: -1 })
 
         res.status(200).json({
             success: true,
