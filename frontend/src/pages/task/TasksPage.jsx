@@ -85,8 +85,14 @@ function TasksPage() {
                             <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 min-w-0">
 
                                 {/* Title */}
-                                <div className="font-medium text-gray-800 truncate sm:w-48">
+                                <div className="font-medium text-gray-800 truncate sm:w-48 flex items-center gap-2">
                                     {task.title}
+
+                                    {!isManager && task.status === "UNTOUCHED" && (
+                                        <span className="text-[10px] px-2 py-[2px] rounded-full bg-blue-100 text-blue-600 font-semibold">
+                                            NEW
+                                        </span>
+                                    )}
                                 </div>
 
                                 {/* Description */}
