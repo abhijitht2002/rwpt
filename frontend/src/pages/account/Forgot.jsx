@@ -40,10 +40,9 @@ function Forgot() {
                         return res.message || "Password changed";
                     },
                     error: (err) =>
-                        err.response?.data?.message || "Verification failed",
+                        err.response?.data?.message || "Operation failed",
                 }
             )
-
         } catch (error) {
             console.log(error);
         } finally {

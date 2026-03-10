@@ -5,5 +5,6 @@ const { protect } = require("../middlewares/auth.middleware");
 
 router.get("/", protect, profileController.getProfile);
 router.patch("/avatar", protect, profileController.changeAvatar);
+router.patch("/password", protect, profileController.changePassword);
 
 module.exports = router;

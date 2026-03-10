@@ -1,5 +1,7 @@
 import React from 'react'
 import { useState } from 'react';
+import { changePasswordAPI } from '../../services/profile.service';
+import toast from "react-hot-toast";
 
 function Reset() {
   const [form, setForm] = useState({
@@ -7,12 +9,45 @@ function Reset() {
     newPassword: "",
     confirmPassword: "",
   });
-
   const [show, setShow] = useState({
     old: false,
     new: false,
     confirm: false,
   });
+  const [loading, setLoading] = useState(false)
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (form.newPassword !== form.confirmPassword) {
+      toast.error("Passwords do not match");
+      return;
+    }
+
+    try {
+      setLoading(true)
+
+      await toast.promise(
+        changePasswordAPI(form.oldPassword, form.newPassword),
+        {
+          loading: "Updating password...",
+          success: (res) => res.message || "Password updated successfully",
+          error: (err) => err.response?.data?.message || "Operation failed",
+        }
+      )
+
+      setForm({
+        oldPassword: "",
+        newPassword: "",
+        confirmPassword: "",
+      })
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
     <>
       <section className="border border-gray-200 p-5 sm:p-8 mb-12">
@@ -22,7 +57,7 @@ function Reset() {
           Enter your current password and choose a new password to update your account.
         </p>
 
-        <form className="mt-8 grid grid-cols-1 gap-6 max-w-md w-full">
+        <form onSubmit={handleSubmit} className="mt-8 grid grid-cols-1 gap-6 max-w-md w-full">
 
           {/* Old Password */}
           <div className="flex flex-col">
@@ -111,6 +146,7 @@ function Reset() {
             <button
               type="submit"
               className="w-full sm:w-auto px-6 py-2 border border-black text-black hover:bg-black hover:text-white transition text-sm"
+              disabled={loading}
             >
               Reset
             </button>

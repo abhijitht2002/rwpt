@@ -9,7 +9,7 @@ const oauthRoutes = require("./routes/oauth.routes")
 const adminRoutes = require("./routes/admin.routes");
 const tasksRoutes = require("./routes/tasks.routes");
 const managerRoutes = require("./routes/manager.routes")
-const profileRoutes = require("./routes/profile.router")
+const profileRoutes = require("./routes/profile.routes")
 const passport = require('./config/passport');
 
 app.use(cors({
