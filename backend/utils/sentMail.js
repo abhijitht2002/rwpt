@@ -3,7 +3,36 @@ const dotenv = require("dotenv");
 const env = require("../config/env");
 dotenv.config()
 
-const mailOTP = () => { }
+const mailOTP = async (email, otp) => {
+    try {
+        const response = await axios.post("https://api.brevo.com/v3/smtp/email",
+            {
+                sender: {
+                    name: "OTP Verification",
+                    email: env.EMAIL_SENDER
+                },
+                to: [
+                    {
+                        email: email
+                    }
+                ],
+                subject: "Your OTP Code",
+                htmlContent: `<p>Your OTP is <strong>${otp}</strong></p>`,
+            },
+            {
+                headers: {
+                    "api-key": env.BREVO_API_KEY,
+                    "Content-Type": "application/json",
+                },
+            }
+        )
+
+        console.log("Brevo response:", response);
+    } catch (error) {
+        console.error("Brevo Mail Error:", error);
+        throw new Error("failed to send OTP email");
+    }
+}
 
 const mailPassword = async (name, email, password) => {
     try {
@@ -43,4 +72,4 @@ const mailPassword = async (name, email, password) => {
     }
 }
 
-module.exports = { mailPassword }
+module.exports = { mailPassword, mailOTP }

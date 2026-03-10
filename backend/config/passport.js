@@ -31,13 +31,14 @@ passport.use(new GoogleStrategy(
 
             // 3. Otherwise create new Google user
             const newUser = new User({
-                name: profile.displayName,
-                email: profile.emails[0].value,
                 googleId: profile.id,
                 avatar: profile.photos[0].value,
-                provider: "GOOGLE",
+                name: profile.displayName,
+                email: profile.emails[0].value,
                 role: "EMPLOYEE",
                 status: "ACTIVE",
+                provider: "GOOGLE",
+                isVerified: true
             });
             user = await newUser.save();
             return done(null, user);

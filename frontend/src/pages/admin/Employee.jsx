@@ -26,6 +26,20 @@ function Employee() {
     fetchEmployee()
   }, [id])
 
+  const formatTime = (secs = 0) => {
+    secs = Math.round(secs);
+
+    const hours = Math.floor(secs / 3600);
+    const minutes = Math.floor((secs % 3600) / 60);
+    const seconds = secs % 60;
+
+    return [
+      hours && `${hours}h`,
+      minutes && `${minutes}m`,
+      seconds && `${seconds}s`
+    ].filter(Boolean).join(" ") || "0s"
+  }
+
   if (loading) return <p>Loading...</p>;
 
   return (
@@ -83,6 +97,14 @@ function Employee() {
               <div className="border border-gray-200 p-6 text-sm">
                 <p className="text-gray-500">Total</p>
                 <p className="mt-2 text-xl font-medium text-gray-900">{stats?.managersWorkedWith}</p>
+              </div>
+            </div>
+
+            <div>
+              <h2 className="text-lg font-medium mb-6">Total time Worked</h2>
+
+              <div className="border border-gray-200 p-6 text-sm">
+                <p className="text-xl font-medium text-gray-600">{formatTime(stats?.totaltime)}</p>
               </div>
             </div>
           </div>

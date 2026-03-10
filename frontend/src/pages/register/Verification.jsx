@@ -2,14 +2,15 @@ import React from "react";
 import { useEffect } from "react";
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { forgotPasswordAPI, genOTPAPI, verifyAPI } from "../../services/auth.service";
+import toast from "react-hot-toast";
 const API_URL = import.meta.env.VITE_API_URL;
 
 function Verification() {
   const location = useLocation();
   const flow = location.state?.flow || "register";
-  const emailFromState = location.state?.email || ""
 
-  const [email, setEmail] = useState(emailFromState);
+  const [email, setEmail] = useState("");
   const [otp, setOTP] = useState("");
   const [timeLeft, setTimeLeft] = useState(0);
   const [isRunning, setIsRunning] = useState(false);
@@ -40,17 +41,72 @@ function Verification() {
   };
 
   const handleGenerate = async () => {
-    setIsRunning(true);
-    setTimeLeft(600);
+    if (!email) {
+      toast.error("Enter email");
+      return;
+    }
+
+    try {
+      let result
+
+      if (flow === "register") {
+        result = await genOTPAPI(email)
+      } else if (flow === "forgot-password") {
+        result = await forgotPasswordAPI(email)
+      }
+
+      if (result?.success) {
+        toast.success(result.message || "OTP sent to your mail");
+        setTimeLeft(600);
+        setIsRunning(true);
+      } else {
+        toast.error(result?.message || "Failed to send OTP");
+      }
+    } catch (err) {
+      console.log(err);
+      toast.error("Something went wrong");
+    }
   };
 
   const handleVerify = async () => {
-    if (flow === "register") {
-      navigate("/account/register");
+    if (!otp) {
+      toast.error("Enter OTP");
+      return;
     }
 
-    if (flow === "forgot-password") {
-      navigate("/account/forgot-password");
+    try {
+      setLoading(true);
+
+      await toast.promise(
+        verifyAPI(email, otp),
+        {
+          loading: "Verifying...",
+          success: (res) => {
+            if (res.success) {
+              if (flow === "register") {
+                navigate("/account/register", {
+                  state: { email }
+                });
+              }
+
+              if (flow === "forgot-password") {
+                navigate("/account/forgot-password", {
+                  state: { email }
+                });
+              }
+            }
+
+            return res.message || "Verification successful";
+          },
+          error: (err) =>
+            err.response?.data?.message || "Verification failed",
+        }
+      )
+    } catch (err) {
+      console.log(err);
+      toast.error("Something went wrong");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -112,7 +168,8 @@ function Verification() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="w-full border px-4 py-3 pr-32 focus:outline-none focus:border-black transition"
-              readOnly={!!emailFromState}
+              readOnly={isRunning}
+              required
             />
 
             {/* Send OTP Button */}
@@ -153,12 +210,14 @@ function Verification() {
               onChange={(e) => setOTP(e.target.value)}
               placeholder="Enter 6-digit code"
               className="w-full border px-4 py-3 tracking-widest focus:outline-none focus:border-black transition"
+              required
             />
 
             <button
               type="submit"
               onClick={handleVerify}
               className="w-full mt-2 border border-black bg-black text-white py-3 transition hover:bg-white hover:text-black hover:cursor-pointer"
+              disabled={loading}
             >
               Verify →
             </button>

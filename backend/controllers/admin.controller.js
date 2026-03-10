@@ -1,8 +1,10 @@
 const bcrypt = require("bcrypt");
 const crypto = require("crypto");
 const User = require("../models/User");
-const { mailPassword } = require("../utils/sentMail");
 const Task = require("../models/Task");
+const { mailPassword } = require("../utils/sentMail");
+const Timelog = require("../models/Timelog");
+
 
 const createManager = async (req, res) => {
     const { name, email } = req.body
@@ -199,6 +201,11 @@ const getEmployeeById = async (req, res) => {
         const managersWorkedWith = await Task.distinct("assigned_by", {
             assigned_to: employee._id,
         });
+        const durations = await Timelog.find({
+            working_by: req.params.id,
+            end: { $ne: null }
+        })
+        const totalDuration = durations.reduce((sum, log) => sum + log.duration, 0);
 
         res.status(200).json({
             success: true,
@@ -207,7 +214,8 @@ const getEmployeeById = async (req, res) => {
                 total,
                 completed,
                 pending,
-                managersWorkedWith: managersWorkedWith.length
+                managersWorkedWith: managersWorkedWith.length,
+                totaltime: totalDuration
             },
         });
     } catch (err) {

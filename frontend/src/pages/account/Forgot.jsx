@@ -1,6 +1,8 @@
 import React from 'react'
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { resetForgotPasswordAPI } from '../../services/auth.service';
+import toast from "react-hot-toast";
 
 function Forgot() {
     const [form, setForm] = useState({
@@ -11,18 +13,42 @@ function Forgot() {
         new: false,
         confirm: false,
     });
-    const navigate = useNavigate()
     const [loading, setLoading] = useState(false)
+    const navigate = useNavigate()
+    const location = useLocation();
+    const email = location.state?.email;
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
         if (form.newPassword !== form.confirmPassword) {
-            alert("Passwords do not match");
+            toast.error("Passwords do not match");
             return;
         }
 
-        navigate("/account/login")
+        try {
+            setLoading(true);
+
+            await toast.promise(
+                resetForgotPasswordAPI(email, form.newPassword),
+                {
+                    loading: "creating...",
+                    success: (res) => {
+                        if (res.success) {
+                            navigate("/account/login")
+                        }
+                        return res.message || "Password changed";
+                    },
+                    error: (err) =>
+                        err.response?.data?.message || "Verification failed",
+                }
+            )
+
+        } catch (error) {
+            console.log(error);
+        } finally {
+            setLoading(false);
+        }
     }
 
     return (

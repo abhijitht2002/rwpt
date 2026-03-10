@@ -19,12 +19,27 @@ export const getMeAPI = async () => {
     return res.data;
 };
 
-export const resetAPI = async () => { };
+export const genOTPAPI = async (email) => {
+    const res = await API.post("/auth/generate-otp", { email })
+    return res.data;
+};
 
-export const forgotAPI = async () => { };
+export const verifyAPI = async (email, otp) => {
+    const res = await API.post("/auth/verify", { email, otp })
+    return res.data;
+};
 
-export const genOTPAPI = async () => { };
+export const registerAPI = async (formData) => {
+    const res = await API.post("/auth/register", formData)
+    return res.data;
+};
 
-export const verifyAPI = async () => { };
+export const forgotPasswordAPI = async (email) => {
+    const res = await API.post("/auth/forgot-password", { email })
+    return res.data;
+};
 
-export const registerAPI = async () => { };
+export const resetForgotPasswordAPI = async (email, password) => {
+    const res = await API.post("/auth/forgot-password/reset", { email, password })
+    return res.data;
+};

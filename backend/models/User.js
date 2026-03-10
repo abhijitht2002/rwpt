@@ -13,7 +13,6 @@ const userSchema = mongoose.Schema(
     },
     name: {
       type: String,
-      required: true,
       trim: true,
     },
     email: {
@@ -41,6 +40,16 @@ const userSchema = mongoose.Schema(
       type: String,
       enum: ["LOCAL", "GOOGLE"],
       default: "LOCAL",
+    },
+    otp: String,
+    otpExpires: Date,
+    otpPurpose: {
+      type: String,
+      enum: ["signup", "reset"]
+    },
+    isVerified: {
+      type: Boolean,
+      default: false
     },
   },
   { timestamps: true },
