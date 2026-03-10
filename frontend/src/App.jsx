@@ -19,8 +19,10 @@ import TasksPage from "./pages/task/TasksPage";
 import Reset from "./pages/account/Reset";
 import Forgot from "./pages/account/Forgot";
 import Task from "./pages/task/Task";
-import OAuthSuccess from "./pages/oauth/OAuthSuccess ";
+import OAuthSuccess from "./pages/oauth/OAuthSuccess";
 import OAuthFailure from "./pages/oauth/OAuthFailure";
+import ProtectedRoute from "./components/ProtectedRoute";
+import PublicRoute from "./components/PublicRoute";
 
 function App() {
   return (
@@ -29,7 +31,7 @@ function App() {
         <Route index element={<HomePage />} />
       </Route>
 
-      <Route path="/account" element={<AuthLayout />}>
+      <Route path="/account" element={<PublicRoute><AuthLayout /></PublicRoute>}>
         <Route path="verify" element={<Verification />} />
         <Route path="register" element={<CreateAccount />} />
         <Route path="login" element={<Login />} />
@@ -41,24 +43,22 @@ function App() {
         <Route path="forgot-password" element={<Forgot />} />
       </Route>
 
-      <Route path="/dashboard" element={<Dashboard />}>
+      <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>}>
         <Route index element={<Summary />} />
-        <Route path="managers" element={<Managers />} />
-        <Route path="managers/:id" element={<Manager />} />
-        <Route path="employees" element={<Employees />} />
-        <Route path="employees/:id" element={<Employee />} />
+        <Route path="managers" element={<ProtectedRoute roles={["ADMIN"]}><Managers /></ProtectedRoute>} />
+        <Route path="managers/:id" element={<ProtectedRoute roles={["ADMIN"]}><Manager /></ProtectedRoute>} />
+        <Route path="employees" element={<ProtectedRoute roles={["ADMIN"]}><Employees /></ProtectedRoute>} />
+        <Route path="employees/:id" element={<ProtectedRoute roles={["ADMIN"]}><Employee /></ProtectedRoute>} />
 
-        <Route path="tasks/:filter" element={<TasksPage />} />
+        <Route path="tasks/:filter" element={<ProtectedRoute roles={["MANAGER", "EMPLOYEE"]}><TasksPage /></ProtectedRoute>} />
+        <Route path="task/:id" element={<ProtectedRoute roles={["MANAGER", "EMPLOYEE"]}><Task /></ProtectedRoute>} />
 
-        <Route path="task/:id" element={<Task />} />
-
-        <Route path="notes" element={<Notes />} />
+        <Route path="notes" element={<ProtectedRoute><Notes /></ProtectedRoute>} />
 
         <Route path="account">
           <Route index element={<Profile />} />
           <Route path="reset-password" element={<Reset />} />
         </Route>
-
       </Route>
     </Routes>
   );
