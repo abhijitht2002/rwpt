@@ -47,21 +47,31 @@ function Verification() {
     }
 
     try {
-      let result
+      await toast.promise(
+        (async () => {
+          let result;
 
-      if (flow === "register") {
-        result = await genOTPAPI(email)
-      } else if (flow === "forgot-password") {
-        result = await forgotPasswordAPI(email)
-      }
+          if (flow === "register") {
+            result = await genOTPAPI(email);
+          } else if (flow === "forgot-password") {
+            result = await forgotPasswordAPI(email);
+          }
 
-      if (result?.success) {
-        toast.success(result.message || "OTP sent to your mail");
-        setTimeLeft(600);
-        setIsRunning(true);
-      } else {
-        toast.error(result?.message || "Failed to send OTP");
-      }
+          if (!result?.success) {
+            throw new Error(result?.message || "Failed to send OTP");
+          }
+
+          return result.message || "OTP sent to your mail";
+        })(),
+        {
+          loading: "Sending OTP...",
+          success: (msg) => msg,
+          error: (err) => err.message || "Failed to send OTP",
+        }
+      );
+
+      setTimeLeft(600);
+      setIsRunning(true);
     } catch (err) {
       console.log(err);
       toast.error("Something went wrong");
