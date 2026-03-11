@@ -38,10 +38,10 @@ function Sidebar({ isOpen, setIsOpen }) {
           { name: "Managers", path: "/dashboard/managers" },
         ],
       },
-      {
-        name: "Tools",
-        children: [{ name: "Notes", path: "/dashboard/notes" }],
-      },
+      // {
+      //   name: "Tools",
+      //   children: [{ name: "Notes", path: "/dashboard/notes" }],
+      // },
     ],
     MANAGER: [
       // { name: "Summary", path: "/dashboard/summary" },
@@ -53,10 +53,10 @@ function Sidebar({ isOpen, setIsOpen }) {
           { name: "Closed", path: "/dashboard/tasks/closed" },
         ],
       },
-      {
-        name: "Tools",
-        children: [{ name: "Notes", path: "/dashboard/notes" }],
-      },
+      // {
+      //   name: "Tools",
+      //   children: [{ name: "Notes", path: "/dashboard/notes" }],
+      // },
     ],
     EMPLOYEE: [
       // { name: "Summary", path: "/dashboard/summary" },
@@ -68,10 +68,10 @@ function Sidebar({ isOpen, setIsOpen }) {
           { name: "Completed", path: "/dashboard/tasks/completed" },
         ],
       },
-      {
-        name: "Tools",
-        children: [{ name: "Notes", path: "/dashboard/notes" }],
-      },
+      // {
+      //   name: "Tools",
+      //   children: [{ name: "Notes", path: "/dashboard/notes" }],
+      // },
     ],
   };
 
