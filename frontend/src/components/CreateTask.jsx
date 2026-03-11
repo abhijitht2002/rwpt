@@ -96,7 +96,7 @@ function CreateTask({ onTaskCreated }) {
 
                 {/* COLLAPSIBLE FORM */}
                 <div
-                    className={`transition-all duration-300 overflow-hidden ${open ? "max-h-[1000px] p-6 border-t border-gray-200" : "max-h-0"
+                    className={`transition-all duration-300 overflow-hidden ${open ? "max-h-250 p-6 border-t border-gray-200" : "max-h-0"
                         }`}
                 >
                     <form onSubmit={handleSubmit} className="grid md:grid-cols-2 gap-6">

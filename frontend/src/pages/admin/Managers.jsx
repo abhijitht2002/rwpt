@@ -1,16 +1,19 @@
 import React from "react";
 import { useState } from "react";
-import { Link } from "react-router-dom";
-import { createManager, listManagers } from "./admin.api";
+import { Link, useNavigate } from "react-router-dom";
+import { createManager, listManagers, searchManagersAPI } from "./admin.api";
 import { useEffect } from "react";
 import toast from "react-hot-toast";
 
 function Managers() {
+  const navigate = useNavigate();
   const [managers, setManagers] = useState([])
   const [form, setForm] = useState({
     name: "",
     email: "",
   })
+  const [searchText, setSearchText] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
@@ -38,6 +41,23 @@ function Managers() {
   useEffect(() => {
     fetchManagers()
   }, [page])
+
+  useEffect(() => {
+    const fetchSearch = async () => {
+      try {
+        const result = await searchManagersAPI(searchText)
+        setSearchResults(result.managers || [])
+      } catch (error) {
+        console.log(error);
+      }
+    }
+
+    if (searchText.trim()) {
+      fetchSearch()
+    } else {
+      setSearchResults([]);
+    }
+  }, [searchText])
 
   const handleAddManager = async (e) => {
     e.preventDefault();
@@ -143,16 +163,47 @@ function Managers() {
             </span>
           </div>
 
-          <div className="w-full mb-8">
+          {/* search bar */}
+          <div className="w-full mb-8 relative">
             <input
               type="text"
-              //   value={value}
-              //   onChange={onChange}
+              value={searchText}
+              onChange={(e) => setSearchText(e.target.value)}
               placeholder="Search managers..."
               className="w-full px-4 py-2 border border-gray-300 text-sm rounded 
                    focus:outline-none focus:ring-1 focus:ring-black 
                    placeholder:text-gray-400 transition"
             />
+            {searchText && (
+              <div className="absolute left-0 right-0 mt-2 bg-white border border-gray-300 rounded shadow-sm overflow-y-auto z-50">
+                {searchResults.length === 0 ? (
+                  <div className="p-2 text-gray-500 text-sm">
+                    No managers found
+                  </div>
+                ) : (
+                  searchResults.map((i) => (
+                    <div
+                      key={i._id}
+                      onClick={() => {
+                        navigate(`/dashboard/managers/${i._id}`);
+                        setSearchText("");
+                        setSearchResults([]);
+                      }}
+                      className="p-2 text-sm hover:bg-gray-100 cursor-pointer transition"
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="font-medium text-gray-800 truncate">
+                          {i.name}
+                        </span>
+                        <span className="text-xs text-gray-500 truncate">
+                          {i.email}
+                        </span>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            )}
           </div>
 
           <div className="">

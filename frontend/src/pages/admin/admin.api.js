@@ -34,4 +34,16 @@ export const getManagerById = async (id) => {
     return res.data
 }
 
+export const searchEmployeesAPI = async (search) => {
+    const res = await API.get("/admin/employees/search", { params: search ? { search } : {} })
+    // console.log(res);
+    return res.data
+}
+
+export const searchManagersAPI = async (search) => {
+    const res = await API.get("/admin/managers/search", { params: search ? { search } : {} })
+    // console.log(res);
+    return res.data
+}
+
 

@@ -56,11 +56,11 @@ function Employee() {
             </p>
           </div>
 
-          <button className="w-full sm:w-auto px-6 py-2 border border-black text-black hover:bg-black hover:text-white transition text-sm"
+          {/* <button className="w-full sm:w-auto px-6 py-2 border border-black text-black hover:bg-black hover:text-white transition text-sm"
             onClick={() => { document.getElementById("edit")?.scrollIntoView({ behavior: "smooth" }) }}
           >
             Edit Employee
-          </button>
+          </button> */}
         </div>
 
         {/* INFO CLUSTER */}
@@ -172,7 +172,7 @@ function Employee() {
         </section>
 
         {/* CHANGE NAME */}
-        <section id="edit" className="border border-gray-200 p-6 sm:p-8 mb-12">
+        {/* <section id="edit" className="border border-gray-200 p-6 sm:p-8 mb-12">
           <h2 className="text-lg sm:text-xl font-medium mb-6">
             Change Name
           </h2>
@@ -191,10 +191,10 @@ function Employee() {
           <button className="mt-4 px-5 py-2 text-sm border border-black hover:bg-black hover:text-white transition">
             Save Changes
           </button>
-        </section>
+        </section> */}
 
         {/* CHANGE EMAIL */}
-        <section className="border border-gray-200 p-6 sm:p-8 mb-12">
+        {/* <section className="border border-gray-200 p-6 sm:p-8 mb-12">
           <h2 className="text-lg sm:text-xl font-medium mb-6">
             Change Email
           </h2>
@@ -213,7 +213,7 @@ function Employee() {
           <button className="mt-4 px-5 py-2 text-sm border border-black hover:bg-black hover:text-white transition">
             Save Changes
           </button>
-        </section>
+        </section> */}
 
         {/* ACTIVITY */}
         {/* <section className="border border-gray-200 p-6 sm:p-8 mb-12">
@@ -298,9 +298,8 @@ function Employee() {
         </section> */}
 
         {/* danger */}
-        <section className="mb-12 border border-red-200 bg-red-50 p-6 sm:p-8">
+        {/* <section className="mb-12 border border-red-200 bg-red-50 p-6 sm:p-8">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-            {/* Left Content */}
             <div>
               <h2 className="text-lg font-medium text-red-700">Danger Zone</h2>
               <p className="mt-2 text-sm text-red-600 max-w-xl">
@@ -310,12 +309,11 @@ function Employee() {
               </p>
             </div>
 
-            {/* Action Button */}
             <button className="w-full sm:w-auto px-6 py-2 border border-red-600 text-red-600 text-sm transition hover:bg-red-600 hover:text-white">
               Blacklist Employee
             </button>
           </div>
-        </section>
+        </section> */}
       </div>
     </div>
   );

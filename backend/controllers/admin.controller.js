@@ -224,4 +224,74 @@ const getEmployeeById = async (req, res) => {
     }
 }
 
-module.exports = { createManager, listManagers, getManagerById, listEmployees, getEmployeeById }
+const searchEmployees = async (req, res) => {
+    try {
+        const { search } = req.query;
+
+        let query = { role: "EMPLOYEE" };
+
+        // search by name or email
+        if (search) {
+            query = {
+                role: "EMPLOYEE",
+                $or: [
+                    { name: { $regex: search, $options: "i" } },
+                    { email: { $regex: search, $options: "i" } },
+                ],
+            }
+        }
+
+        const employees = await User.find(query)
+            .select("_id name email")
+            .sort({ name: 1 });
+
+        res.status(200).json({
+            success: true,
+            employees
+        });
+    } catch (error) {
+        console.error(error);
+
+        res.status(500).json({
+            success: false,
+            message: "Failed to fetch employees"
+        });
+    }
+}
+
+const searchManagers = async (req, res) => {
+    try {
+        const { search } = req.query;
+
+        let query = { role: "MANAGER" };
+
+        // search by name or email
+        if (search) {
+            query = {
+                role: "MANAGER",
+                $or: [
+                    { name: { $regex: search, $options: "i" } },
+                    { email: { $regex: search, $options: "i" } },
+                ],
+            }
+        }
+
+        const managers = await User.find(query)
+            .select("_id name email")
+            .sort({ name: 1 });
+
+        res.status(200).json({
+            success: true,
+            managers
+        });
+    } catch (error) {
+        console.error(error);
+
+        res.status(500).json({
+            success: false,
+            message: "Failed to fetch managers"
+        });
+    }
+}
+
+module.exports = { createManager, listManagers, getManagerById, listEmployees, getEmployeeById, searchEmployees, searchManagers }
