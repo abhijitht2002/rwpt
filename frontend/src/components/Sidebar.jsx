@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { searchTasksAPI } from "../services/task.service";
 import toast from "react-hot-toast";
 
 function Sidebar({ isOpen, setIsOpen }) {
@@ -9,6 +10,23 @@ function Sidebar({ isOpen, setIsOpen }) {
   const navigate = useNavigate();
   const [searchText, setSearchText] = useState("");
   const [searchResults, setSearchResults] = useState([]);
+
+  useEffect(() => {
+    const fetchTasks = async () => {
+      try {
+        const result = await searchTasksAPI(searchText);
+        setSearchResults(result.tasks || []);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+
+    if (searchText.trim()) {
+      fetchTasks();
+    } else {
+      setSearchResults([]);
+    }
+  }, [searchText])
 
   const linksByRole = {
     ADMIN: [
@@ -98,7 +116,7 @@ function Sidebar({ isOpen, setIsOpen }) {
 
           {/* Search bar  */}
           {(user?.role === "MANAGER" || user?.role === "EMPLOYEE") && (
-            <div className="p-4 border-b border-gray-200">
+            <div className="p-4 border-b border-gray-200 relative">
               <input
                 type="text"
                 placeholder="Search tasks..."
@@ -107,7 +125,7 @@ function Sidebar({ isOpen, setIsOpen }) {
                 className="w-full px-3 py-2 rounded border border-gray-300 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
               />
               {searchText && (
-                <div className="mt-2 bg-white border border-gray-300 rounded shadow-sm max-h-60 overflow-y-auto">
+                <div className="absolute left-0 right-0 mt-2 bg-white border border-gray-300 rounded shadow-sm max-h-60 overflow-y-auto z-50">
                   {searchResults.length === 0 ? (
                     <div className="p-2 text-gray-500 text-sm">
                       No tasks found
@@ -119,7 +137,7 @@ function Sidebar({ isOpen, setIsOpen }) {
                         onClick={() => {
                           navigate(`/dashboard/task/${task._id}`);
                           setSearchText("");
-                          setIsOpen(false);
+                          // setIsOpen(false);
                         }}
                         className="p-2 text-sm hover:bg-gray-100 cursor-pointer"
                       >
@@ -127,7 +145,7 @@ function Sidebar({ isOpen, setIsOpen }) {
                           {task.title}
                         </div>
                         <div className="text-xs text-gray-500">
-                          {task.assigned_to?.name || "Unassigned"}
+                          {task.status}
                         </div>
                       </div>
                     ))

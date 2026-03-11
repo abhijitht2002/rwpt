@@ -37,7 +37,7 @@ function Task() {
 
     useEffect(() => {
         fetchTask()
-    }, [])
+    }, [id])
 
     useEffect(() => {
         let interval

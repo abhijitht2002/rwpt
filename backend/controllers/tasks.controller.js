@@ -206,6 +206,36 @@ const endTask = async (req, res) => {
     }
 }
 
-const searchTask = async (req, res) => { }
+const searchTask = async (req, res) => {
+    try {
+        const { search } = req.query
 
-module.exports = { listTasks, getTaskById, startTask, endTask }
+        let query = {};
+
+        if (req.user.role === "MANAGER") {
+            query.assigned_by = req.user.id
+        } else if (req.user.role === "EMPLOYEE") {
+            query.assigned_to = req.user.id
+        }
+
+        if (search) {
+            query.title = { $regex: search, $options: "i" }
+        }
+
+        const tasks = await Task.find(query).sort({ createdAt: -1 });
+
+        res.status(200).json({
+            success: true,
+            tasks
+        });
+    } catch (error) {
+        console.error(error);
+
+        res.status(500).json({
+            success: false,
+            message: "Failed to fetch tasks"
+        });
+    }
+}
+
+module.exports = { searchTask, listTasks, getTaskById, startTask, endTask }
