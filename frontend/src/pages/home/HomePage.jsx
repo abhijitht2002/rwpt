@@ -1,7 +1,9 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 function HomePage() {
+  const navigate = useNavigate()
+  
   return (
     <div className="min-h-screen bg-white text-gray-900 px-6">
       {/* HERO */}
@@ -16,7 +18,9 @@ function HomePage() {
         </p>
 
         <div className="mt-10">
-          <button className="px-8 py-3 border border-black text-black hover:cursor-pointer hover:bg-black hover:text-white transition">
+          <button className="px-8 py-3 border border-black text-black hover:cursor-pointer hover:bg-black hover:text-white transition"
+            onClick={() => navigate("/account/login")}
+          >
             Get Started
           </button>
         </div>
