@@ -212,7 +212,7 @@ const login = async (req, res) => {
   try {
     const { email, password } = req.body;
     if (!email || !password) {
-      return res.status(401).json({ message: "Fields required" });
+      return res.status(400).json({ message: "Fields required" });
     }
 
     const user = await User.findOne({ email });
@@ -229,7 +229,7 @@ const login = async (req, res) => {
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
       secure: env.NODE_ENV === "production",
-      sameSite: "Strict",
+      sameSite: "none",
       maxAge: 7 * 24 * 60 * 60 * 1000, // 7days
     })
 
@@ -273,7 +273,7 @@ const refresh = async (req, res) => {
 const logout = (req, res) => {
   res.clearCookie("refreshToken", {
     httpOnly: true,
-    sameSite: "Strict",
+    sameSite: "none",
     secure: env.NODE_ENV === "production",
   });
   res.json({ message: "Logged out successfully" });

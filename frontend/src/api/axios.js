@@ -26,7 +26,7 @@ API.interceptors.response.use(
     async (error) => {
         const originalRequest = error.config;
 
-        // 🚫 Do NOT try refresh for login or refresh routes
+        // Do NOT try refresh for login or refresh routes
         if (
             error.response?.status === 401 &&
             !originalRequest._retry &&
@@ -37,7 +37,7 @@ API.interceptors.response.use(
 
             try {
                 const res = await axios.post(
-                    "http://localhost:3000/api/auth/refresh",
+                    `${API_URL}/auth/refresh`,
                     {},
                     { withCredentials: true }
                 );
@@ -48,7 +48,7 @@ API.interceptors.response.use(
                 originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
                 return API(originalRequest);
             } catch (refreshError) {
-                // 🔥 Redirect to correct login route
+                // Redirect to correct login route
                 window.location.href = "/account/login";
                 return Promise.reject(refreshError);
             }
