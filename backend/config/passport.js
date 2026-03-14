@@ -8,7 +8,7 @@ passport.use(new GoogleStrategy(
     {
         clientID: env.GOOGLE_CLIENT_ID,
         clientSecret: env.GOOGLE_CLIENT_SECRET,
-        callbackURL: "http://localhost:3000/api/auth/google/callback",
+        callbackURL: "https://rwpt.onrender.com/api/auth/google/callback",
         passReqToCallback: true,
     },
     async (req, accessToken, refreshToken, profile, done) => {
